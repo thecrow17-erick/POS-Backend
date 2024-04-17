@@ -37,8 +37,10 @@ export class EmployeeController {
         email: true,
         phone: true,
         rol: true,
+        branch: true,
+        status: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
       }
     });
     return {

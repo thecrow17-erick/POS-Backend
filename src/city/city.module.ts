@@ -8,6 +8,9 @@ import { PrismaModule } from 'src/prisma';
   providers: [CityService],
   imports: [
     PrismaModule
+  ],
+  exports: [
+    CityService
   ]
 })
 export class CityModule {}

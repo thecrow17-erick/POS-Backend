@@ -23,7 +23,7 @@ export class CityController {
 
   @Get()
   async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto) {
-    const statusCode = HttpStatus.ACCEPTED;
+    const statusCode = HttpStatus.OK;
     const skip = query.skip??0;
     const take = query.limit??Number.MAX_SAFE_INTEGER;
     const total = await this.cityService.countAll({});

@@ -82,7 +82,8 @@ export class EmployeeService {
     skip,
     take,
     where,
-    cursor
+    cursor,
+    select
     }: IOptionEmployees
     ) {
     try {
@@ -92,6 +93,7 @@ export class EmployeeService {
         take,
         cursor,
         orderBy,
+        select
       });
       return employees;
     } catch (err) {
