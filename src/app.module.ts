@@ -1,10 +1,22 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PrismaModule } from './prisma';
+import { EmployeeModule } from './employee';
+import {ConfigModule} from '@nestjs/config';
+import { EnvConfig, EnvSchema } from './config';
+import { NodemailersModule } from './nodemailers/nodemailers.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      load: [EnvConfig],
+      validationSchema: EnvSchema,
+    }),
+    PrismaModule, 
+    EmployeeModule, 
+    NodemailersModule, CommonModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
