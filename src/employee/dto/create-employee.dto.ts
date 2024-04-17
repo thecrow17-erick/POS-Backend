@@ -1,4 +1,4 @@
-import { IsEmail, IsPhoneNumber, IsString, MinLength } from "class-validator";
+import { IsEmail, IsNumberString, IsPhoneNumber, IsString, MinLength } from "class-validator";
 
 export class CreateEmployeeDto {
   @IsString()
@@ -12,4 +12,9 @@ export class CreateEmployeeDto {
   @IsString()
   @IsPhoneNumber('BO')
   phone:        string;
+
+  @IsNumberString()
+  @IsString()
+  branchId:     string;
+
 }

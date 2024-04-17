@@ -13,22 +13,25 @@ export class EmployeeController {
   @UseInterceptors(FileInterceptor(''))
   async create(@Body() createEmployeeDto: CreateEmployeeDto) {
     const statusCode = HttpStatus.CREATED;
+    const employee = await this.employeeService.createAtm(createEmployeeDto);
     return {
       statusCode,
       message: "Employee ATM created",
-      data: await this.employeeService.createAtm(createEmployeeDto)
+      data: {
+        employee
+      }
     }
   }
 
   @Get()
   async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto) {
-    console.log(query);
-    
     const statusCode = HttpStatus.ACCEPTED;
+    const skip = query.skip??0;
+    const take = query.limit??Number.MAX_SAFE_INTEGER;
     const total = await this.employeeService.countAll({});
     const employees = await this.employeeService.findAll({
-      skip:query.skip??undefined, 
-      take: query.limit??undefined,
+      skip, 
+      take,
       select:{
         id: true,
         email: true,

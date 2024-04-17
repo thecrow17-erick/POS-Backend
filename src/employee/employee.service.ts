@@ -16,11 +16,16 @@ export class EmployeeService {
 
   async createAtm(createEmployeeDto: CreateEmployeeDto) {
     try {
-      
       const employeeExist = await this.findEmployeeAtm({
         where:{
-          email: createEmployeeDto.email,
-          phone: createEmployeeDto.phone,
+          OR:[
+            {
+              email: createEmployeeDto.email,
+            },
+            {
+              phone: createEmployeeDto.phone,
+            }
+          ]
         }
       })
       if(employeeExist) throw new BadRequestException("employee in system")
@@ -30,14 +35,18 @@ export class EmployeeService {
           data:{
             ...createEmployeeDto,
             rol: "Empleado",
+            branchId: +createEmployeeDto.branchId,
             codeEmployee: uuid().replace(/-/g, "").substring(0,12),
           }
         })
-          await this.mailerService.sendMailEmployeeAtm({
+        const sendEmailEmployee = await this.mailerService.sendMailEmployeeAtm({
           codigo: employeeCreateAtm.codeEmployee,
           email: employeeCreateAtm.email,
           name: employeeCreateAtm.name
         })
+
+        console.log(sendEmailEmployee);
+        
         return employeeCreateAtm;
       })
 

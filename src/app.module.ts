@@ -5,6 +5,8 @@ import {ConfigModule} from '@nestjs/config';
 import { EnvConfig, EnvSchema } from './config';
 import { NodemailersModule } from './nodemailers/nodemailers.module';
 import { CommonModule } from './common/common.module';
+import { BranchModule } from './branch/branch.module';
+import { CityModule } from './city/city.module';
 
 @Module({
   imports: [
@@ -14,9 +16,14 @@ import { CommonModule } from './common/common.module';
     }),
     PrismaModule, 
     EmployeeModule, 
-    NodemailersModule, CommonModule,
+    NodemailersModule, CommonModule, BranchModule, CityModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(){
+    console.log(process.env.TZ)
+  }
+
+}

@@ -14,6 +14,11 @@ datasource db {
 }
 
 
+enum Rol{
+  Administrador
+  Empleado
+}
+
 model Employee{
   id                      String @default(uuid()) @id
   codeEmployee            String @db.Text
@@ -21,14 +26,41 @@ model Employee{
   name                    String @db.VarChar(50)
   phone                   String @db.VarChar(8)
   photo                   String? @db.Text
+  status                  Boolean @default(true)
+
   rol                     Rol
+  branchId                Int
+  branch                  Branch @relation(fields: [branchId], references: [id])
 
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @default(now()) @updatedAt
+  createdAt               DateTime @default(now()) @db.Timestamp()
+  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
 }
 
+model Branch{
+  id                      Int @default(autoincrement()) @id
+  address                 String @db.VarChar(60)
+  name                    String @db.VarChar(50)
+  lat                     Decimal @db.Decimal()
+  lng                     Decimal @db.Decimal()
+  status                  Boolean @default(true)
 
-enum Rol{
-  Administrador
-  Empleado
+  cityId                  Int 
+  city                    City @relation(fields: [cityId], references: [id])
+
+  employee                Employee[]
+
+  createdAt               DateTime @default(now()) @db.Timestamp()  
+  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
 }
+
+model City{
+  id                      Int @default(autoincrement()) @id
+  name                    String @db.VarChar(50)  
+  status                  Boolean @default(true)
+
+  branch                  Branch[]
+
+  createdAt               DateTime @default(now()) @db.Timestamp()
+  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
+}
+
