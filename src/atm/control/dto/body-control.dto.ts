@@ -4,9 +4,8 @@ export class BodyControlDto{
   @IsDecimal()
   monto:          string;
 
-  @IsUUID()
   @IsString()
-  employeeId:     string;
+  employeeCode:     string;
 
   @IsNumber()
   @IsInt()
