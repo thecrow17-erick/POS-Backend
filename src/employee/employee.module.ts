@@ -4,6 +4,7 @@ import { EmployeeController } from './employee.controller';
 import { PrismaModule } from 'src/prisma';
 import { ConfigModule } from '@nestjs/config';
 import { NodemailersModule } from 'src/nodemailers/nodemailers.module';
+import { BranchModule } from 'src/branch/branch.module';
 
 @Module({
   controllers: [EmployeeController],
@@ -11,7 +12,11 @@ import { NodemailersModule } from 'src/nodemailers/nodemailers.module';
   imports: [
     PrismaModule,
     ConfigModule,
-    NodemailersModule
+    NodemailersModule,
+    BranchModule
+  ],
+  exports: [
+    EmployeeService
   ]
 })
 export class EmployeeModule {}

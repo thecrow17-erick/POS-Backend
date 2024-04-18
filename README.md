@@ -26,37 +26,31 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
+## Paso 1: Instalar los paquetes(solamente si recien los instalaste)
 
 ```bash
-$ npm install
+$ npm i
 ```
 
-## Running the app
+## Paso 2: ajustar el archivo .env.example a .env
+Aqui tienes que cambiar solamente la url de tu base de datos local, sino tienes la base de datos, creala en postgres
+
+
+## Paso 3: Empezar con la migracion de prisma
+
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
+#Si no tienes ninguna migracion
+$ npx prisma migrate dev
+#Si sale que no compila el archivo migration_lock.toml, deja de ejecutar el modo de desarrollo y ejecuta esto
+$ npx prisma generate
+#Si te sale otro error, es que hay nuevos atributos agregados a tablas con datos, tienes que eliminar esos datos y ejecutar el primer codigo
+```
+## Paso 4: Si todo salio normal ejecuta el modo de desarrollo
+```bash
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
 
 ## Support
 

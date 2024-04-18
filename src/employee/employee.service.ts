@@ -1,17 +1,19 @@
-import {  BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {  BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { PrismaService } from 'src/prisma';
 import { NodemailersService } from 'src/nodemailers';
 import {v4 as uuid} from 'uuid';
 import { IOptionEmployees } from './interface';
+import { BranchService } from 'src/branch/branch.service';
 
 @Injectable()
 export class EmployeeService {
 
   constructor(
     private readonly prisma:PrismaService, 
-    private readonly mailerService: NodemailersService
+    private readonly mailerService: NodemailersService,
+    private readonly branchService: BranchService,
   ){}
 
   async createAtm(createEmployeeDto: CreateEmployeeDto) {
@@ -29,7 +31,9 @@ export class EmployeeService {
         }
       })
       if(employeeExist) throw new BadRequestException("employee in system")
-      
+      await this.branchService.findOne(+createEmployeeDto.branchId,{});
+
+
       const response = await this.prisma.$transaction(async(t) => {
         const employeeCreateAtm = await t.employee.create({
           data:{
@@ -53,7 +57,7 @@ export class EmployeeService {
       return response;
     } catch (err) {
       if(err instanceof BadRequestException) throw err;
-
+      if(err instanceof NotFoundException) throw err;
       throw new InternalServerErrorException(`Internal server error $${JSON.stringify(err)}`);
     }
   }
@@ -115,9 +119,17 @@ export class EmployeeService {
     }
   }
 
-  findOne(msg:string) {
-    // const ugu = this.mailerService.sendMailPrueba(msg)
-    return 'dsadsa';
+  async findOne(id:string) {
+    try {
+      const employeeFind = await this.prisma.employee.findUnique({
+        where:{
+          id
+        }
+      })
+      return employeeFind;
+    } catch (err) {
+      throw new InternalServerErrorException(`Internal server error $${JSON.stringify(err)}`);
+    }
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
