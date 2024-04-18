@@ -10,6 +10,9 @@ import { CityModule } from 'src/city/city.module';
   imports: [
     PrismaModule,
     CityModule
+  ],
+  exports: [
+    BranchService
   ]
 })
 export class BranchModule {}

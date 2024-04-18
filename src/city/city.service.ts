@@ -115,9 +115,7 @@ export class CityService {
         where:{
           id
         },
-        data: {
-          name: updateCityDto.name
-        }
+        data: updateCityDto
       })
       
       return cityUpdate;

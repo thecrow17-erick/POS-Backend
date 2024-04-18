@@ -7,6 +7,7 @@ import { NodemailersModule } from './nodemailers/nodemailers.module';
 import { CommonModule } from './common/common.module';
 import { BranchModule } from './branch/branch.module';
 import { CityModule } from './city/city.module';
+import { AtmModule } from './atm/atm.module';
 
 @Module({
   imports: [
@@ -16,14 +17,9 @@ import { CityModule } from './city/city.module';
     }),
     PrismaModule, 
     EmployeeModule, 
-    NodemailersModule, CommonModule, BranchModule, CityModule,
+    NodemailersModule, CommonModule, BranchModule, CityModule, AtmModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  constructor(){
-    console.log(process.env.TZ)
-  }
-
-}
+export class AppModule {}

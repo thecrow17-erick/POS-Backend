@@ -20,7 +20,7 @@ enum Rol{
 }
 
 model Employee{
-  id                      String @default(uuid()) @id
+  id                      String @db.Uuid @default(uuid()) @id
   codeEmployee            String @db.Text
   email                   String @db.VarChar(50)
   name                    String @db.VarChar(50)
@@ -31,6 +31,9 @@ model Employee{
   rol                     Rol
   branchId                Int
   branch                  Branch @relation(fields: [branchId], references: [id])
+
+  controlATM              ControlATM[]
+
 
   createdAt               DateTime @default(now()) @db.Timestamp()
   updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
@@ -48,6 +51,7 @@ model Branch{
   city                    City @relation(fields: [cityId], references: [id])
 
   employee                Employee[]
+  atm                     Atm[]
 
   createdAt               DateTime @default(now()) @db.Timestamp()  
   updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
@@ -62,5 +66,40 @@ model City{
 
   createdAt               DateTime @default(now()) @db.Timestamp()
   updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
+}
+
+model Atm{
+  id                      Int @id @default(autoincrement())
+  name                    String @db.VarChar(50)
+  status                  Boolean @default(true)
+
+  branchId                Int
+  branch                  Branch @relation(fields: [branchId],references: [id])
+
+  controlAtm              ControlATM[]
+
+  createdAt               DateTime @default(now()) @db.Timestamp()
+  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
+}
+
+model ControlATM{
+  id                      Int @id @default(autoincrement())
+  date                    DateTime @db.Date @default(now())
+  hour                    DateTime @db.Time() @default(now())
+  monto                   Decimal @db.Decimal(10,2)
+
+  type                    TypeAtm
+  
+  employeeId              String @db.Uuid
+  employee                Employee @relation(fields: [employeeId], references: [id])
+
+  atmId                   Int
+  atm                     Atm @relation(fields: [atmId], references: [id])
+
+}
+
+enum TypeAtm{
+  Apertura
+  Cierre
 }
 
