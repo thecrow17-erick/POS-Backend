@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFile, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFile, HttpStatus, Res } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ParseQueryPipe, QueryCommonDto } from 'src/common';
+import { Response } from 'express';
 
 @Controller('employee')
 export class EmployeeController {
@@ -11,20 +12,20 @@ export class EmployeeController {
 
   @Post('atm')
   @UseInterceptors(FileInterceptor(''))
-  async create(@Body() createEmployeeDto: CreateEmployeeDto) {
+  async create(@Body() createEmployeeDto: CreateEmployeeDto, @Res() res: Response) {
     const statusCode = HttpStatus.CREATED;
     const employee = await this.employeeService.createAtm(createEmployeeDto);
-    return {
+    return res.status(statusCode).json({
       statusCode,
       message: "Employee ATM created",
       data: {
         employee
       }
-    }
+    })
   }
 
   @Get()
-  async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto) {
+  async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto, @Res() res: Response) {
     const statusCode = HttpStatus.ACCEPTED;
     const skip = query.skip??0;
     const take = query.limit??Number.MAX_SAFE_INTEGER;
@@ -43,14 +44,14 @@ export class EmployeeController {
         updatedAt: true,
       }
     });
-    return {
+    return res.status(statusCode).json({
       statusCode,
       message: "All employees",
       data:{
         total,
         employees
       }
-    };
+    })
   }
 
 
