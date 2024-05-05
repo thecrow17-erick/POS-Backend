@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BodyControlDto } from './dto/body-control.dto';
-import { EmployeeService } from 'src/employee';
 import { AtmService } from '../atm.service';
 import { PrismaService } from 'src/prisma';
 
@@ -8,7 +7,6 @@ import { PrismaService } from 'src/prisma';
 export class ControlService {
 
   constructor(
-    private readonly employeeService: EmployeeService,
     private readonly atmService: AtmService,
     private readonly prisma: PrismaService
   ){}
@@ -16,18 +14,18 @@ export class ControlService {
 
   async open(bodyControlDto :BodyControlDto){
     try {
-      const employeeFind = await this.employeeService.findEmployeeAtm({
-        where:{
-          codeEmployee: bodyControlDto.employeeCode,
-        }
-      });
-      if(!employeeFind) throw new NotFoundException("Employee not found")
+      // const employeeFind = await this.employeeService.findEmployeeAtm({
+      //   where:{
+      //     codeEmployee: bodyControlDto.employeeCode,
+      //   }
+      // });
+      // if(!employeeFind) throw new NotFoundException("Employee not found")
       //ahora pregunto si existe el atm
       await this.atmService.findOne(bodyControlDto.atmId,{});
       //ahora si lo creo
       const openAtm = await this.prisma.controlATM.create({
         data:{
-          employeeId: employeeFind.id,
+          employeeId: "dawawddqwaqwer",
           monto: bodyControlDto.monto,
           atmId: bodyControlDto.atmId,
           type: "Apertura"
@@ -44,18 +42,18 @@ export class ControlService {
 
   async close(bodyControlDto :BodyControlDto){
     try {
-      const employeeFind = await this.employeeService.findEmployeeAtm({
-        where:{
-          codeEmployee: bodyControlDto.employeeCode,
-        }
-      });
-      if(!employeeFind) throw new NotFoundException("Employee not found")
+      // const employeeFind = await this.employeeService.findEmployeeAtm({
+      //   where:{
+      //     codeEmployee: bodyControlDto.employeeCode,
+      //   }
+      // });
+      // if(!employeeFind) throw new NotFoundException("Employee not found")
       //ahora pregunto si existe el atm
       await this.atmService.findOne(bodyControlDto.atmId,{});
       //ahora si lo creo
       const openAtm = await this.prisma.controlATM.create({
         data:{
-          employeeId: employeeFind.id,
+          employeeId: "dasasdfasas",
           monto: bodyControlDto.monto,
           atmId: bodyControlDto.atmId,
           type: "Cierre"

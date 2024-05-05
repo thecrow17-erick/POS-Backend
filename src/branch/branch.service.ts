@@ -4,6 +4,7 @@ import { UpdateBranchDto } from './dto/update-branch.dto';
 import { PrismaService } from 'src/prisma';
 import { IOptionBranch } from './interface';
 import { CityService } from '../city/city.service';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class BranchService {
