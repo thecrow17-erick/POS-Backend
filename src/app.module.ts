@@ -30,6 +30,9 @@ import { AzureConnectionModule } from './azure-connection/azure-connection.modul
     SeedModule,
     MailsModule,
     AzureConnectionModule,
+    SuscriptionModule
+    MailsModule,
+    AzureConnectionModule,
   ],
   controllers: [],
   providers: [],
