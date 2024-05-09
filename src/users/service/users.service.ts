@@ -70,4 +70,17 @@ export class UsersService {
       throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
     }
   }
+
+  async findIdUser(id: string){
+    try {
+      const FindUser = await this.prisma.user.findUnique({
+        where:{
+          id
+        }
+      })
+      return FindUser;
+    } catch (err) {
+      throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
+    }
+  }
 }

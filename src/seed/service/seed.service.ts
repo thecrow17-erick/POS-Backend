@@ -56,7 +56,7 @@ export class SeedService {
     }
   }
 
-  async seedPermission(){
+  async seedPermission(tenantId: number){
     try{
       const modules = await this.prisma.module.findMany();
 
@@ -76,6 +76,7 @@ export class SeedService {
           create:     true,
           edit:       true,
           delete:     true,
+          tenantId
         }))
       })
 

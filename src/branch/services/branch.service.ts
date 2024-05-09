@@ -1,10 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateBranchDto } from './dto/create-branch.dto';
-import { UpdateBranchDto } from './dto/update-branch.dto';
+import { CreateBranchDto,UpdateBranchDto } from '../dto';
 import { PrismaService } from 'src/prisma';
-import { IOptionBranch } from './interface';
-import { CityService } from '../city/city.service';
-import { PrismaClient } from '@prisma/client';
+import { IOptionBranch } from '../interface';
+import { CityService } from 'src/city/services';
 
 @Injectable()
 export class BranchService {
@@ -14,7 +12,7 @@ export class BranchService {
     private readonly cityService: CityService
   ){}
 
-  async create(createBranchDto: CreateBranchDto) {
+  async create(createBranchDto: CreateBranchDto,tenantId: number) {
     try {
       await this.cityService.findOne(createBranchDto.cityId,{});
       //si existe seguimos pregutnando por los otros datos
@@ -32,7 +30,10 @@ export class BranchService {
       if(branchExist) throw new BadRequestException("Branch office in system")
       //ya si todo esta bien lo creo
       const branchCreate = await this.prisma.branch.create({
-        data: createBranchDto
+        data: {
+          ...createBranchDto,
+          tenantId
+        }
       })
       
       return branchCreate;

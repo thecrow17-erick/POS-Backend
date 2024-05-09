@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CityService } from './city.service';
-import { CityController } from './city.controller';
+import { CityService } from './services';
+import { CityController } from './controllers';
 import { PrismaModule } from 'src/prisma';
 
 @Module({

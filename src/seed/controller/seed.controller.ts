@@ -15,7 +15,6 @@ export class SeedController {
     const messages = await Promise.all([
       this.seedService.seedRol(),
       this.seedService.seedModule(),
-      this.seedService.seedPermission(),
       this.seedService.seedSuscription(),
       this.seedService.seedPaymentMethod(),
     ])

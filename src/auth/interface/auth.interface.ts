@@ -1,22 +1,32 @@
-import { role } from "src/constants";
+import { roles } from "src/constants";
 
-
+//SAAS
+export interface PayloadToken{
+  userId: string;
+}
 export interface IUseToken {
-  role:       string;
+  userId:     string;
+  isExpired:  boolean
+}
+export interface AuthTokenResult {
+  userId:   string;
+  iat:      number;
+  exp:      number;
+}
+//tenant
+export interface IUseTokenService {
+  role:      string;
   userId:     string;
   isExpired:  boolean
 }
 
 export interface PayloadTokenTenant {
   userId: string;
-  role:   role;
-}
-export interface PayloadToken{
-  userId: string;
+  role:   roles;
 }
 
-export interface AuthTokenResult {
-  role:     string;
+export interface AuthTokenResultService {
+  role?:    string;
   userId:   string;
   iat:      number;
   exp:      number;

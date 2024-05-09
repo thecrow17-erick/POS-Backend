@@ -5,4 +5,5 @@ export interface IPermissions {
   create:     boolean,
   edit:       boolean,
   delete:     boolean,
+  tenantId:   number, 
 }

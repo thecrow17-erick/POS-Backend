@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { BodyControlDto } from './dto/body-control.dto';
-import { AtmService } from '../atm.service';
+import { BodyControlDto } from '../dto/body-control.dto';
+import { AtmService } from '../services';
 import { PrismaService } from 'src/prisma';
 
 @Injectable()

@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateCityDto } from './dto/create-city.dto';
-import { UpdateCityDto } from './dto/update-city.dto';
+import { CreateCityDto,UpdateCityDto } from '../dto';
 import { PrismaService } from 'src/prisma';
-import { IOptionCitys } from './interface';
+import { IOptionCitys } from '../interface';
 
 @Injectable()
 export class CityService {
@@ -11,7 +10,7 @@ export class CityService {
     private readonly prisma: PrismaService,
   ){}
 
-  async create(createCityDto: CreateCityDto) {
+  async create(createCityDto: CreateCityDto,tenantId: number) {
     try {
       const cityExist = await this.findCity({
         where:{
@@ -23,6 +22,7 @@ export class CityService {
       const cityCreate = await this.prisma.city.create({
         data: {
           name: createCityDto.name,
+          tenantId
         }
       })
 

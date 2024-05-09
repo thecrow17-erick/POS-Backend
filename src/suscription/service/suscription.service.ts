@@ -7,7 +7,7 @@ import {v4 as uuid}from 'uuid';
 import { PrismaService } from 'src/prisma';
 import { IOptionSuscription } from '../interface';
 import { SuscriptionCreateDto } from '../dto';
-import { role } from 'src/constants';
+import { roles } from 'src/constants';
 
 @Injectable()
 export class SuscriptionService {
@@ -158,7 +158,8 @@ export class SuscriptionService {
           }
         })
 
-        const userRole: keyof typeof role = 'Administrador';
+        const userRole: keyof typeof roles = 'Administrador';
+
         const roleId = await tx.rol.findFirst({
           where:{
             desc: userRole

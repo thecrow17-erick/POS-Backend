@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BranchService } from './branch.service';
-import { BranchController } from './branch.controller';
+import { BranchService } from './services';
+import { BranchController } from './controllers';
 import { PrismaModule } from 'src/prisma';
 import { CityModule } from 'src/city/city.module';
 

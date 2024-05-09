@@ -1,9 +1,8 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateAtmDto } from './dto/create-atm.dto';
-import { UpdateAtmDto } from './dto/update-atm.dto';
-import { IOptionAtm } from './interface';
+import { CreateAtmDto,UpdateAtmDto } from '../dto';
+import { IOptionAtm } from '../interface';
 import { PrismaService } from 'src/prisma';
-import { BranchService } from 'src/branch/branch.service';
+import { BranchService } from 'src/branch/services';
 
 @Injectable()
 export class AtmService {
@@ -13,13 +12,16 @@ export class AtmService {
     private readonly branchService: BranchService,
   ){}
 
-  async create(createAtmDto: CreateAtmDto) {
+  async create(createAtmDto: CreateAtmDto, tenantId: number) {
     try {
       //pregunto si existe el id del branch
       await this.branchService.findOne(createAtmDto.branchId,{});
       //creo La caja
       const atmCreated = await this.prisma.atm.create({
-        data: createAtmDto
+        data: {
+          ...createAtmDto,
+          tenantId
+        }
       })
 
       return atmCreated;

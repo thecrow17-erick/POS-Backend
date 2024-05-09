@@ -13,6 +13,7 @@ import { SuscriptionModule } from './suscription/suscription.module';
 import { MailsModule } from './mails/mails.module';
 import { AzureConnectionModule } from './azure-connection/azure-connection.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,11 +31,10 @@ import { AzureConnectionModule } from './azure-connection/azure-connection.modul
     SeedModule,
     MailsModule,
     AzureConnectionModule,
-    SuscriptionModule
+    SuscriptionModule,
     MailsModule,
     AzureConnectionModule,
   ],
-  controllers: [],
   providers: [],
 })
 export class AppModule {}
