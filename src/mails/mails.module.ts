@@ -12,15 +12,15 @@ import { MailsController } from './mails.controller';
     MailerModule.forRootAsync({
       useFactory: async (config:ConfigService) => ({
         transport: {
-          host: config.get('host_email'),
+          host: config.get<string>("host_email"),
           secure: false,
           auth: {
-            user: config.get('account_email'),
-            pass: config.get('password_email'),
+            user: config.get<string>("account_email"),
+            pass: config.get<string>("password_email"),
           },
         },
         defaults: {
-          from: `"No Reply" <${config.get('account_email')}>`,
+          from: `"No Reply" <${config.get<string>('account_email')}>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
