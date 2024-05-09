@@ -8,3 +8,4 @@ export const EnvConfig = () => ({
   host_email: process.env.HOST_EMAIL,
   secret_key_jwt: process.env.SECRET_KEY_JWT,
 })
+
