@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
 import { SuscriptionModule } from './suscription/suscription.module';
 import { MailsModule } from './mails/mails.module';
+import { AzureConnectionModule } from './azure-connection/azure-connection.module';
 
 @Module({
   imports: [
@@ -27,8 +28,8 @@ import { MailsModule } from './mails/mails.module';
     UsersModule, 
     AuthModule, 
     SeedModule,
-    SuscriptionModule,
-    MailsModule
+    MailsModule,
+    AzureConnectionModule,
   ],
   controllers: [],
   providers: [],
