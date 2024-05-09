@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {Stripe} from 'stripe';
 import { addDays, format,parseISO } from 'date-fns';
@@ -8,13 +8,15 @@ import { PrismaService } from 'src/prisma';
 import { IOptionSuscription } from '../interface';
 import { SuscriptionCreateDto } from '../dto';
 import { roles } from 'src/constants';
+import { SeedService } from '../../seed/service/seed.service';
 
 @Injectable()
 export class SuscriptionService {
   private readonly stripe: Stripe;
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly seedService: SeedService
   ){
     this.stripe = new Stripe(this.configService.get<string>("stripe_key"))
   }
@@ -166,6 +168,7 @@ export class SuscriptionService {
           }
         })
 
+
         const memberTenantCreate = await tx.memberTenant.create({
           data:{
             passwordTenant: uuid().replace("-","").substring(0,8),
@@ -174,14 +177,20 @@ export class SuscriptionService {
             userId: dataBody.userId
           }
         })
+        
         return {
           tenant: tenatCreate,
           members: memberTenantCreate,
           payment
         }
       })
+      await this.seedService.seedPermission(response.tenant.id);
+
       return response;
     } catch (err) {
+      if(err instanceof BadRequestException)
+        throw err
+    
       console.log(err);
       throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
     }

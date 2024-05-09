@@ -8,6 +8,9 @@ import { PrismaModule, PrismaService } from 'src/prisma';
   controllers: [SeedController],
   imports: [
     PrismaModule
+  ],
+  exports:[
+    SeedService
   ]
 })
 export class SeedModule {}

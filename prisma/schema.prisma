@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,408 +7,333 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//SaaS
-model CardPayment{
-  id              Int           @default(autoincrement())  @id
-  name            String        @db.VarChar(50)
-  cardNumber      String        @db.Text
-  dateDue         String        @db.Text
-  cvc             String        @db.Text 
-  status          Boolean       @default(true)
-
-  userId          String        @db.Uuid 
-  user            User          @relation(fields: [userId], references: [id])
-
-  payments        paymentMembreship[]
-
-  createdAt       DateTime      @default(now()) @db.Timestamp()
-  updatedAt       DateTime      @default(now()) @updatedAt @db.Timestamp()
+model Suscription {
+  id          Int                 @id @default(autoincrement())
+  name        String              @db.VarChar(50)
+  duracion    Int
+  createdAt   DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  status      Boolean             @default(true)
+  price       Decimal             @db.Decimal(10, 2)
+  membreshits paymentMembreship[]
 }
 
-model Suscription{
-  id              Int         @default(autoincrement())@id
-  name            String      @db.VarChar(50)
-  price           Decimal     @db.Money
-  duracion        Int         @db.Integer
-  status          Boolean     @default(true)
-
-  membreshits     paymentMembreship[]
-
-  createdAt       DateTime    @default(now()) @db.Timestamp()
-  updatedAt       DateTime    @default(now()) @updatedAt @db.Timestamp()
+model Tenant {
+  id          Int                 @id @default(autoincrement())
+  hosting     String
+  createdAt   DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  status      Boolean             @default(true)
+  Atm         Atm[]
+  Branch      Branch[]
+  Buys        Buys[]
+  Category    Category[]
+  City        City[]
+  Client      Client[]
+  invitations InvitationTenant[]
+  Permission  Permission[]
+  Product     Product[]
+  Provider    Provider[]
+  Sales       Sales[]
+  Stock       Stock[]
+  users       memberTenant[]
+  membreshits paymentMembreship[]
 }
 
-model Tenant{
-  id              Int     @id     @default(autoincrement())
-  hosting         String          @db.Text 
-  status          Boolean         @default(true)
-
-  users           memberTenant[]
-
-  invitations     InvitationTenant[]
-
-  membreshits     paymentMembreship[]
-
-  createdAt       DateTime        @default(now()) @db.Timestamp()
-  updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamp()
-}
-
-model paymentMembreship{
-  tenantId          Int           @db.Integer
-  tenant            Tenant        @relation(fields: [tenantId], references: [id])
-
-  suscriptionId     Int           @db.Integer
-  suscription       Suscription   @relation(fields: [suscriptionId], references: [id])
-
-  cardPaymentId     Int           @db.Integer
-  cardPayment       CardPayment   @relation(fields: [cardPaymentId],references: [id])
+model paymentMembreship {
+  tenantId      Int
+  suscriptionId Int
+  endTime       DateTime    @db.Timestamp(6)
+  startTime     DateTime    @db.Timestamp(6)
+  suscription   Suscription @relation(fields: [suscriptionId], references: [id])
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
 
   @@id([tenantId, suscriptionId])
-} 
-
-model memberTenant{
-  userId            String      @db.Uuid
-  user              User        @relation(fields: [userId], references: [id])
-
-  tenantId          Int         @db.Integer
-  tenant            Tenant      @relation(fields: [tenantId], references: [id])
-
-  passwordTenant    String      @db.Text
-
-  rolId             Int         @db.Integer
-  rol               Rol         @relation(fields: [rolId],references: [id])
-
-  @@id([userId,tenantId])
-}
-//sistema
-model Rol{
-  id                      Int       @default(autoincrement()) @id
-  desc                    String    @db.VarChar(60)
-
-  memberTenant            memberTenant[] 
-
-  permissions             Permission[]
-
 }
 
-model Permission{
-  rolId                   Int     @db.Integer
-  rol                     Rol     @relation(fields: [rolId],references: [id])
+model memberTenant {
+  userId         String @db.Uuid
+  tenantId       Int
+  passwordTenant String
+  rolId          Int
+  rol            Rol    @relation(fields: [rolId], references: [id])
+  tenant         Tenant @relation(fields: [tenantId], references: [id])
+  user           User   @relation(fields: [userId], references: [id])
 
-  moduleId                Int     @db.Integer
-  module                  Module  @relation(fields: [moduleId],references: [id])
-
-  get                     Boolean
-  create                  Boolean
-  edit                    Boolean
-  delete                  Boolean
-
-
-  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
-
-  @@id([rolId, moduleId])
+  @@id([userId, tenantId])
 }
 
-model Module{
-  id                      Int       @default(autoincrement()) @id
-  name                    String    @db.VarChar(60)
-
-  permissions             Permission[]
-
+model Rol {
+  id           Int            @id @default(autoincrement())
+  desc         String         @db.VarChar(60)
+  permissions  Permission[]
+  memberTenant memberTenant[]
 }
 
-model InvitationTenant{
-  id                      Int       @default(autoincrement()) @id
-
-  tenantId                Int       @db.Integer
-  tenant                  Tenant    @relation(fields: [tenantId],references: [id])
-
-  userId                  String    @db.Uuid
-  user                    User      @relation(fields: [userId],references: [id])
-
-  state                   StateInvitation 
-  status                  Boolean   @default(true)
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
+model Permission {
+  id        Int     @id @default(autoincrement())
+  rolId     Int
+  moduleId  Int
+  get       Boolean
+  create    Boolean
+  edit      Boolean
+  delete    Boolean
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId  Int      @db.Integer
+  module    Module   @relation(fields: [moduleId], references: [id])
+  rol       Rol      @relation(fields: [rolId], references: [id])
+  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
 }
 
-enum StateInvitation{
+model Module {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(60)
+  permissions Permission[]
+}
+
+model InvitationTenant {
+  id        Int             @id @default(autoincrement())
+  tenantId  Int
+  userId    String          @db.Uuid
+  state     StateInvitation
+  status    Boolean         @default(true)
+  createdAt DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt DateTime        @default(now()) @updatedAt @db.Timestamp(6)
+  tenant    Tenant          @relation(fields: [tenantId], references: [id])
+  user      User            @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id          String             @id @default(uuid()) @db.Uuid
+  email       String             @db.VarChar(50)
+  password    String
+  name        String             @db.VarChar(50)
+  phone       String             @db.VarChar(8)
+  photo       String?            @db.Text
+  status      Boolean            @default(true)
+  createdAt   DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime           @default(now()) @updatedAt @db.Timestamp(6)
+  buys        Buys[]
+  controlATM  ControlATM[]
+  invitations InvitationTenant[]
+  tenants     memberTenant[]
+}
+
+model Category {
+  id          Int               @id @default(autoincrement())
+  description String
+  status      Boolean           @default(true)
+  createdAt   DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime          @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId    Int
+  Tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  products    CategoryProduct[]
+}
+
+model CategoryProduct {
+  categoryId Int
+  productId  Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@id([categoryId, productId])
+}
+
+model Product {
+  id           Int               @id @default(autoincrement())
+  name         String            @db.VarChar(60)
+  description  String
+  price        Decimal           @db.Decimal(10, 2)
+  discount     Decimal           @default(0) @db.Decimal(5, 2)
+  status       Boolean           @default(true)
+  images       String[]          @default([])
+  createdAt    DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime          @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId     Int
+  categoys     CategoryProduct[]
+  detailsBuys  DetailsBuys[]
+  detailsSales DetailsSales[]
+  Tenant       Tenant            @relation(fields: [tenantId], references: [id])
+  stock        Stock?
+}
+
+model Stock {
+  id         Int         @id @default(autoincrement())
+  cantTotal  Int
+  productId  Int         @unique
+  updatedAt  DateTime    @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId   Int
+  inventorys Inventory[]
+  product    Product     @relation(fields: [productId], references: [id])
+  Tenant     Tenant      @relation(fields: [tenantId], references: [id])
+}
+
+model Inventory {
+  branchId  Int
+  stockId   Int
+  cant      Int
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  branch    Branch   @relation(fields: [branchId], references: [id])
+  stock     Stock    @relation(fields: [stockId], references: [id])
+
+  @@id([branchId, stockId])
+}
+
+model DetailsBuys {
+  productId Int
+  buyId     Int
+  cant      Int
+  import    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  buy       Buys     @relation(fields: [buyId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@id([productId, buyId])
+}
+
+model Buys {
+  id         Int           @id @default(autoincrement())
+  time       DateTime      @default(now()) @db.Timestamp(6)
+  total      Decimal       @db.Decimal(10, 2)
+  status     Boolean       @default(true)
+  userId     String        @db.Uuid
+  providerId String        @db.Uuid
+  createdAt  DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId   Int
+  provider   Provider      @relation(fields: [providerId], references: [id])
+  Tenant     Tenant        @relation(fields: [tenantId], references: [id])
+  user       User          @relation(fields: [userId], references: [id])
+  details    DetailsBuys[]
+}
+
+model Provider {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @db.VarChar(50)
+  name      String   @db.VarChar(60)
+  phone     String   @db.VarChar(8)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId  Int
+  buys      Buys[]
+  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Branch {
+  id         Int         @id @default(autoincrement())
+  address    String      @db.VarChar(60)
+  name       String      @db.VarChar(50)
+  lat        Decimal     @db.Decimal
+  lng        Decimal     @db.Decimal
+  status     Boolean     @default(true)
+  cityId     Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @default(now()) @updatedAt
+  tenantId   Int
+  atm        Atm[]
+  city       City        @relation(fields: [cityId], references: [id])
+  Tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  inventorys Inventory[]
+}
+
+model City {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamp(1)
+  updatedAt DateTime @default(now()) @updatedAt
+  tenantId  Int
+  branch    Branch[]
+  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Atm {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(50)
+  status     Boolean      @default(true)
+  branchId   Int
+  createdAt  DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId   Int
+  branch     Branch       @relation(fields: [branchId], references: [id])
+  Tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  controlAtm ControlATM[]
+  sales      Sales[]
+}
+
+model ControlATM {
+  id         Int      @id @default(autoincrement())
+  monto      Decimal  @db.Decimal(10, 2)
+  type       TypeAtm
+  employeeId String   @db.Uuid
+  atmId      Int
+  time       DateTime @default(now()) @db.Timestamp(6)
+  atm        Atm      @relation(fields: [atmId], references: [id])
+  employee   User     @relation(fields: [employeeId], references: [id])
+}
+
+model DetailsSales {
+  saleId    Int
+  productId Int
+  cant      Int
+  import    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  product   Product  @relation(fields: [productId], references: [id])
+  sale      Sales    @relation(fields: [saleId], references: [id])
+
+  @@id([saleId, productId])
+}
+
+model Sales {
+  id              Int            @id @default(autoincrement())
+  time            DateTime       @default(now()) @db.Timestamp(6)
+  total           Decimal        @db.Decimal(10, 2)
+  pay             Decimal        @db.Decimal(10, 2)
+  change          Decimal        @db.Decimal(10, 2)
+  nitClient       String?        @db.VarChar(20)
+  status          Boolean        @default(true)
+  atmId           Int
+  clientId        String         @db.Uuid
+  paymentMethodId Int
+  createdAt       DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId        Int
+  details         DetailsSales[]
+  atm             Atm            @relation(fields: [atmId], references: [id])
+  client          Client         @relation(fields: [clientId], references: [id])
+  paymentMethod   PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
+  Tenant          Tenant         @relation(fields: [tenantId], references: [id])
+}
+
+model Client {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @db.VarChar(60)
+  name      String   @db.VarChar(50)
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  tenantId  Int
+  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  sales     Sales[]
+}
+
+model PaymentMethod {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(60)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  sales       Sales[]
+}
+
+enum StateInvitation {
   Espera
   Aceptado
   Cancelado
 }
 
-
-model User{
-  id                      String  @db.Uuid @default(uuid()) @id
-  email                   String  @db.VarChar(50)
-  password                String  @db.Text   
-  name                    String  @db.VarChar(50)
-  phone                   String  @db.VarChar(8) 
-  photo                   String? @db.Text
-  status                  Boolean @default(true)
-
-  cards                   CardPayment[]
-
-  tenants                 memberTenant[]
-
-  invitations             InvitationTenant[]
-
-  controlATM              ControlATM[]
-
-  buys                    Buys[]
-
-  
-  createdAt               DateTime @default(now()) @db.Timestamp()
-  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Category{
-  id                      Int       @default(autoincrement()) @id
-  description             String    @db.Text
-  status                  Boolean   @default(true)
-
-  products                CategoryProduct[]
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model CategoryProduct{
-  categoryId              Int @db.Integer
-  category                Category @relation(fields: [categoryId],references: [id])  
-
-  productId               Int @db.Integer
-  product                 Product @relation(fields: [productId],references: [id])
-
-  @@id([categoryId,productId])
-}
-
-
-model Product {
-  id                      Int       @default(autoincrement()) @id
-  name                    String    @db.VarChar(60)
-  description             String    @db.Text
-  price                   Decimal   @db.Money
-  discount                Decimal   @db.Decimal(5,2) @default(0)
-  status                  Boolean   @default(true)
-
-  categoys                CategoryProduct[]
-
-  stock                   Stock?
-
-  detailsBuys             DetailsBuys[]
-
-  detailsSales            DetailsSales[]
-
-  images                  String[]  @db.Text @default([])
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Stock{
-  id            Int       @default(autoincrement()) @id
-  cantTotal     Int       @db.Integer
-
-  productId     Int       @db.Integer @unique
-  product       Product   @relation(fields: [productId],references: [id])
-
-  inventorys    Inventory[]
-
-  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Inventory{
-  branchId      Int       @db.Integer
-  branch        Branch    @relation(fields: [branchId],references: [id])
-
-  stockId       Int       @db.Integer
-  stock         Stock     @relation(fields: [stockId],references: [id])
-
-  cant          Int       @db.Integer
-
-  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamp()
-  createdAt     DateTime  @default(now()) @db.Timestamp()
-
-  @@id([branchId,stockId])
-}
-
-model DetailsBuys{
-  productId               Int       @db.Integer
-  product                 Product   @relation(fields: [productId],references: [id])
-
-  buyId                   Int       @db.Integer
-  buy                     Buys      @relation(fields: [buyId],references: [id])
-
-  cant                    Int       @db.Integer
-  import                  Decimal   @db.Money
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-
-  @@id([productId,buyId])
-}
-
-model Buys{
-  id                      Int       @id @default(autoincrement())
-  time                    DateTime  @default(now()) @db.Timestamp()
-  total                   Decimal   @db.Money
-  status                  Boolean   @default(true)
-
-  userId                  String    @db.Uuid
-  user                    User      @relation(fields: [userId],references: [id])
-
-  providerId              String    @db.Uuid
-  provider                Provider  @relation(fields: [providerId],references: [id])
-
-  details                 DetailsBuys[]
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()  
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Provider{
-  id                      String    @db.Uuid @default(uuid()) @id
-  email                   String    @db.VarChar(50) 
-  name                    String    @db.VarChar(60)
-  phone                   String    @db.VarChar(8)
-  status                  Boolean   @default(true)
-
-  buys                    Buys[]
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()  
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Branch{
-  id                      Int       @default(autoincrement()) @id
-  address                 String    @db.VarChar(60)
-  name                    String    @db.VarChar(50)
-  lat                     Decimal   @db.Decimal()
-  lng                     Decimal   @db.Decimal()
-  status                  Boolean   @default(true)
-
-  cityId                  Int 
-  city                    City @relation(fields: [cityId], references: [id])
-
-  atm                     Atm[]
-
-  inventorys              Inventory[]
-
-  createdAt               DateTime @default(now()) @db.Timestamp()  
-  updatedAt               DateTime @default(now()) @updatedAt @db.Timestamp()
-}
-
-model City{
-  id                      Int       @default(autoincrement()) @id
-  name                    String    @db.VarChar(50)  
-  status                  Boolean   @default(true)
-
-  branch                  Branch[]
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model Atm{
-  id                      Int       @default(autoincrement())@id
-  name                    String    @db.VarChar(50)
-  status                  Boolean   @default(true)
-
-  branchId                Int
-  branch                  Branch    @relation(fields: [branchId],references: [id])
-
-  controlAtm              ControlATM[]
-
-  sales                   Sales[]
-
-
-  createdAt               DateTime  @default(now()) @db.Timestamp()
-  updatedAt               DateTime  @default(now()) @updatedAt @db.Timestamp()
-}
-
-model ControlATM{
-  id                      Int         @default(autoincrement())@id
-  time                    DateTime    @default(now()) @db.Timestamp()
-  monto                   Decimal     @db.Decimal(10,2)
-
-  type                    TypeAtm
-  
-  employeeId              String      @db.Uuid
-  employee                User        @relation(fields: [employeeId], references: [id])
-
-  atmId                   Int
-  atm                     Atm         @relation(fields: [atmId], references: [id])
-
-}
-enum TypeAtm{
+enum TypeAtm {
   Apertura
   Cierre
 }
-
-model DetailsSales{
-  saleId                  Int         @db.Integer
-  sale                    Sales       @relation(fields: [saleId],references: [id])
-
-  productId               Int         @db.Integer
-  product                 Product     @relation(fields: [productId],references: [id])
-
-  cant                    Int         @db.Integer
-  import                  Decimal     @db.Money
-
-  createdAt               DateTime    @default(now()) @db.Timestamp()
-
-  @@id([saleId,productId])
-}
-
-model Sales{
-  id                      Int             @default(autoincrement()) @id
-  time                    DateTime        @default(now()) @db.Timestamp()
-  total                   Decimal         @db.Money
-  pay                     Decimal         @db.Money
-  change                  Decimal         @db.Money
-  nitClient               String?         @db.VarChar(20)
-  status                  Boolean         @default(true)
-
-  atmId                   Int             @db.Integer
-  atm                     Atm             @relation(fields: [atmId],references: [id])
-
-  clientId                String          @db.Uuid
-  client                  Client          @relation(fields: [clientId],references: [id])
-
-  paymentMethodId         Int             @db.Integer
-  paymentMethod           PaymentMethod   @relation(fields: [paymentMethodId],references: [id]) 
-  
-  details                 DetailsSales[]
-
-  createdAt               DateTime        @default(now()) @db.Timestamp()
-  updatedAt               DateTime        @default(now()) @updatedAt @db.Timestamp()
-}
-
-
-model Client{
-  id                      String      @db.Uuid @default(uuid()) @id
-  email                   String      @db.VarChar(60) 
-  name                    String      @db.VarChar(50)
-  status                  Boolean     @default(true)
-
-  sales                   Sales[]
-
-  createdAt               DateTime    @default(now()) @db.Timestamp()
-  updatedAt               DateTime    @default(now()) @updatedAt @db.Timestamp()
-}
-
-
-model PaymentMethod{
-  id                      Int         @default(autoincrement()) @id
-  description             String      @db.VarChar(60)
-
-  sales                   Sales[]
-
-  createdAt               DateTime    @default(now()) @db.Timestamp()
-  updatedAt               DateTime    @default(now()) @updatedAt @db.Timestamp()
-}
-
-
-

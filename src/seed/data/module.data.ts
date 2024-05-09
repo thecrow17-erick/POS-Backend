@@ -26,5 +26,8 @@ export const dataModule: IModule[] = [
   },
   {
     name: "Proveedor"
+  },
+  {
+    name: "Caja"
   }
 ]

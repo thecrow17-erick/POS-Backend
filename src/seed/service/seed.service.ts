@@ -62,10 +62,18 @@ export class SeedService {
 
       const roles = await this.prisma.rol.findMany();
 
+      const tenant = await this.prisma.tenant.findUnique({
+        where:{
+          id: tenantId
+        }
+      })
+      if(!tenant)
+        throw new BadRequestException("tenant bad request");
+
       if(modules.length === 0 && roles.length === 0) 
         throw new BadRequestException("insert the seeds of roles and modules");
 
-      const bodyPermission:IPermissions[] = [];
+      let bodyPermission:IPermissions[] = [];
 
       roles.map (role => {
         modules.map(module =>
@@ -76,7 +84,7 @@ export class SeedService {
           create:     true,
           edit:       true,
           delete:     true,
-          tenantId
+          tenantId:   tenant.id
         }))
       })
 
