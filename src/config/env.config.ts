@@ -7,5 +7,11 @@ export const EnvConfig = () => ({
   password_email: process.env.PASSWORD_EMAIL ,
   host_email: process.env.HOST_EMAIL,
   secret_key_jwt: process.env.SECRET_KEY_JWT,
+  stripe_key: process.env.STRIPE_KEY,
+  stripe_sucess_url: process.env.STRIPE_SUCESS_URL,
+  stripe_cancel_url: process.env.STRIPE_CANCEL_URL,
+  accout_name_storage: process.env.ACCOUNT_NAME_STORAGE,
+  key_account_storage: process.env.KEY_ACCOUNT_STORAGE,
+  account_host_storage: process.env.ACCOUT_HOST_STORAGE 
 })
 

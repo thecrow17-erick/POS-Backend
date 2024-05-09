@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma';
-import {rolData, dataModule, dataPaymentMethod,dataSuscription} from '../data';
 import { IPermissions } from '../interface';
+import {rolData, dataModule, dataPaymentMethod,dataSuscription} from '../data';
 
 @Injectable()
 export class SeedService {
