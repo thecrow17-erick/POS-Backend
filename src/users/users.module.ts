@@ -3,6 +3,7 @@ import { UsersController } from './controller';
 import { UsersService } from './service';
 import { PrismaModule } from 'src/prisma';
 import { NestjsFormDataModule } from 'nestjs-form-data';
+import { MailsModule } from 'src/mails/mails.module';
 
 @Module({
   controllers: [UsersController],
@@ -10,6 +11,7 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
   imports: [
     PrismaModule,
     NestjsFormDataModule,
+    MailsModule
   ],
   exports: [UsersService],
 })

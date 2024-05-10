@@ -9,7 +9,6 @@ export class MailsService {
 
   async sendUserConfirmation(user: string, email: string) {
     const url = `https://www.youtube.com/watch?v=L4tCfUbicfo`;
-    console.log('entra');
     await this.mailService.sendMail({
       to: email,
       subject: 'Bienvenido a POS',

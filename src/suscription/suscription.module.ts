@@ -4,6 +4,7 @@ import { SuscriptionService } from './service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SeedModule } from 'src/seed/seed.module';
 import { UsersModule } from 'src/users/users.module';
+import { MailsModule } from 'src/mails/mails.module';
 
 @Module({
   controllers: [SuscriptionController],
@@ -11,7 +12,8 @@ import { UsersModule } from 'src/users/users.module';
   imports: [
     PrismaModule,
     SeedModule,
-    UsersModule
+    UsersModule,
+    MailsModule
   ]
 })
 export class SuscriptionModule {

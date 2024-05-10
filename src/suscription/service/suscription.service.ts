@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {Stripe} from 'stripe';
-import { addDays, format,parseISO } from 'date-fns';
+import { addDays} from 'date-fns';
 import {v4 as uuid}from 'uuid';
+import * as bcrypt  from 'bcrypt';
 
 import { PrismaService } from 'src/prisma';
 import { IOptionSuscription } from '../interface';
 import { SuscriptionCreateDto } from '../dto';
 import { roles } from 'src/constants';
 import { SeedService } from '../../seed/service/seed.service';
+import { MailsService } from 'src/mails/mails.service';
 
 @Injectable()
 export class SuscriptionService {
@@ -16,7 +18,8 @@ export class SuscriptionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
-    private readonly seedService: SeedService
+    private readonly seedService: SeedService,
+    private readonly mailsService: MailsService
   ){
     this.stripe = new Stripe(this.configService.get<string>("stripe_key"))
   }
@@ -139,11 +142,20 @@ export class SuscriptionService {
         suscriptionId: +body.suscriptionId,
         userId: body.userId
       } 
+      const saltOrRounds = bcrypt.genSaltSync(10)
       const suscriptionFind = await this.findSuscriptionId(dataBody.suscriptionId);
       const response = await this.prisma.$transaction(async(tx)=>{
         const timeNow = new Date();
         const startTime =timeNow;
         const endTime =addDays(timeNow, suscriptionFind.duracion);
+
+        const userFind = await tx.user.findUnique({
+          where:{
+            id: dataBody.userId
+          }
+        })
+        if(!userFind)
+          throw new NotFoundException("user not found")
 
         const tenatCreate = await tx.tenant.create({
           data:{
@@ -168,16 +180,23 @@ export class SuscriptionService {
           }
         })
 
-
+        const password = uuid().replace("-","").substring(0,8)
         const memberTenantCreate = await tx.memberTenant.create({
           data:{
-            passwordTenant: uuid().replace("-","").substring(0,8),
+            passwordTenant: bcrypt.hashSync(password,saltOrRounds),
             rolId: roleId.id,
             tenantId: tenatCreate.id,
             userId: dataBody.userId
           }
         })
-        
+        await this.mailsService.sendCredencialesCliente(
+          userFind.name,
+          userFind.email,
+          suscriptionFind.name,
+          tenatCreate.hosting,
+          password
+        )
+
         return {
           tenant: tenatCreate,
           members: memberTenantCreate,
@@ -185,7 +204,6 @@ export class SuscriptionService {
         }
       })
       await this.seedService.seedPermission(response.tenant.id);
-
       return response;
     } catch (err) {
       console.log(err);

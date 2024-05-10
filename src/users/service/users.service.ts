@@ -5,12 +5,14 @@ import * as bcrypt  from 'bcrypt';
 import { PrismaService } from 'src/prisma';
 import { createUserDto } from '../dto';
 import { IOptionUser } from '../interface';
+import { MailsService } from 'src/mails/mails.service';
 
 @Injectable()
 export class UsersService {
 
   constructor(
     private readonly prisma : PrismaService,
+    private readonly mailsService: MailsService
   ){}
   
   async createUser(body: createUserDto){
@@ -35,17 +37,20 @@ export class UsersService {
       
       if(findUser) 
         throw new BadRequestException("user bad request")
-      const [userCreate] = await this.prisma.$transaction([
-        this.prisma.user.create({
+      const response = await this.prisma.$transaction(async(tx)=>{
+
+        const userCreate = await tx.user.create({
           data: {
             email: body.email,
             phone: body.phone,
             name:  body.name,
             password: bcrypt.hashSync(body.password,saltOrRounds)
           }
-        })
-      ])
-      return userCreate;
+        });
+        await this.mailsService.sendUserConfirmation(userCreate.name,userCreate.email);
+        return userCreate;
+      })
+      return response;
     } catch (error) {
       if(error instanceof BadRequestException) 
         throw error;
