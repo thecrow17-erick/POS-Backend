@@ -8,4 +8,5 @@ export interface IOptionBranch{
   orderBy? :Prisma.BranchOrderByWithRelationInput,
   cursor?: Prisma.BranchWhereUniqueInput,
   distinct?: Prisma.BranchScalarFieldEnum | Prisma.BranchScalarFieldEnum[],
+  include?:   Prisma.BranchInclude,
 }

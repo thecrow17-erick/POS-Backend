@@ -15,6 +15,7 @@ import { AzureConnectionModule } from './azure-connection/azure-connection.modul
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { FileSystemStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
+import { ProviderModule } from './provider/provider.module';
 
 
 @Module({
@@ -46,6 +47,7 @@ import { FileSystemStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
     AzureConnectionModule,
     CategoryModule,
     ProductModule,
+    ProviderModule,
   ],
   providers: [],
 })

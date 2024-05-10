@@ -8,4 +8,5 @@ export interface IOptionUser{
   orderBy? :Prisma.UserOrderByWithRelationInput,
   cursor?: Prisma.UserWhereUniqueInput,
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[],
+  include?:   Prisma.UserInclude,
 }

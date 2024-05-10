@@ -8,4 +8,5 @@ export interface IOptionProducts{
   orderBy? :Prisma.ProductOrderByWithRelationInput,
   cursor?: Prisma.ProductWhereUniqueInput,
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[],
+  include?:   Prisma.ProductInclude,
 }

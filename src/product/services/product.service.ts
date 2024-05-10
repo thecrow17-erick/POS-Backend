@@ -6,7 +6,6 @@ import { PrismaService } from 'src/prisma';
 import { ProductCreateDto } from '../dto/create-product.dto';
 import { IOptionProducts, IReqCategory } from '../interface';
 import { UpdateProductDto } from '../dto';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
@@ -244,7 +243,7 @@ export class ProductService {
         },
         data:{
           status: !findProduct.status
-        }
+        },
       });
 
       return deleteProduct;

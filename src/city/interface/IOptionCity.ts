@@ -8,4 +8,5 @@ export interface IOptionCitys{
   orderBy? :Prisma.CityOrderByWithRelationInput,
   cursor?: Prisma.CityWhereUniqueInput,
   distinct?: Prisma.CityScalarFieldEnum | Prisma.CityScalarFieldEnum[],
+  include?:   Prisma.CityInclude,
 }

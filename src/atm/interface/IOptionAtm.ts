@@ -8,4 +8,5 @@ export interface IOptionAtm{
   orderBy? :Prisma.AtmOrderByWithRelationInput,
   cursor?: Prisma.AtmWhereUniqueInput,
   distinct?: Prisma.AtmScalarFieldEnum | Prisma.AtmScalarFieldEnum[],
+  include?:   Prisma.AtmInclude,
 }

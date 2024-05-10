@@ -150,7 +150,7 @@ model Product {
   createdAt    DateTime          @default(now()) @db.Timestamp(6)
   updatedAt    DateTime          @default(now()) @updatedAt @db.Timestamp(6)
   tenantId     Int
-  categoys     CategoryProduct[]
+  categories   CategoryProduct[]
   detailsBuys  DetailsBuys[]
   detailsSales DetailsSales[]
   Tenant       Tenant            @relation(fields: [tenantId], references: [id])

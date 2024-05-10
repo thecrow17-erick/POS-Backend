@@ -8,4 +8,5 @@ export interface IOptionSuscription{
   orderBy? :Prisma.SuscriptionOrderByWithRelationInput,
   cursor?: Prisma.SuscriptionWhereUniqueInput,
   distinct?: Prisma.SuscriptionScalarFieldEnum | Prisma.SuscriptionScalarFieldEnum[],
+  include?:   Prisma.SuscriptionInclude,
 }

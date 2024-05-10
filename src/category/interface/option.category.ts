@@ -8,4 +8,5 @@ export interface IOptionCategories{
   orderBy? :Prisma.CategoryOrderByWithRelationInput,
   cursor?: Prisma.CategoryWhereUniqueInput,
   distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[],
+  include?:   Prisma.CategoryInclude,
 }

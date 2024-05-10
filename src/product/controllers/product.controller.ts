@@ -38,7 +38,7 @@ export class ProductController {
           discount: true,
           price: true,
           images: true,
-          categoys: {
+          categories: {
             select: {
               category:{
                 select:{
@@ -131,7 +131,7 @@ export class ProductController {
           }
         },
         status: true,
-        categoys:{
+        categories:{
           select:{
             category:{
               select:{
