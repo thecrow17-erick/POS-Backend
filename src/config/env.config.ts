@@ -12,6 +12,7 @@ export const EnvConfig = () => ({
   stripe_cancel_url: process.env.STRIPE_CANCEL_URL,
   accout_name_storage: process.env.ACCOUNT_NAME_STORAGE,
   key_account_storage: process.env.KEY_ACCOUNT_STORAGE,
-  account_host_storage: process.env.ACCOUT_HOST_STORAGE 
+  account_host_storage: process.env.ACCOUT_HOST_STORAGE,
+  conection_string_storage: process.env.CONECTION_STRING_STORAGE
 })
 

@@ -13,4 +13,5 @@ export const EnvSchema = Joi.object({
   ACCOUNT_NAME_STORAGE: Joi.string().required(),
   KEY_ACCOUNT_STORAGE : Joi.string().required(),
   ACCOUT_HOST_STORAGE : Joi.string().required(),
+  CONECTION_STRING_STORAGE: Joi.string().required(),
 })

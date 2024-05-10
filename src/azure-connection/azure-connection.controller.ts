@@ -29,7 +29,7 @@ export class AzureConnectionController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    await this.azureConnectionService.uploadImage(file);
+    await this.azureConnectionService.uploadImage(file.buffer,"dfasasdasd.png","imagenes");
     return 'Imagen Subida';
   }
 
@@ -42,7 +42,7 @@ export class AzureConnectionController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const data = await this.azureConnectionService.visualizarImage(name);
+    const data = await this.azureConnectionService.visualizarImage(name,"imagenes");
     return data.pipe(res);
   }
 
@@ -54,7 +54,7 @@ export class AzureConnectionController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const blobUrl = await this.azureConnectionService.getImageUrl(filename);
+    const blobUrl = await this.azureConnectionService.getImageUrl(filename,"imagenes");
     return blobUrl;
   }
 
@@ -65,6 +65,7 @@ export class AzureConnectionController {
   ): Promise<void> {
     const readableStream = await this.azureConnectionService.visualizarImage(
       filename,
+      "imagenes"
     );
     res.setHeader('Content-Disposition', `attachment; filename=${filename}`); // Establece el nombre del archivo para descargar
     res.setHeader('Content-Type', 'image/jpeg'); // Establece el tipo de contenido de la respuesta (puedes ajustarlo según el tipo de imagen que estás descargando)
@@ -79,7 +80,7 @@ export class AzureConnectionController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    await this.azureConnectionService.deleteImage(filename);
+    await this.azureConnectionService.deleteImage(filename,"imagenes");
     return 'Imagen Eliminada';
   }
 }

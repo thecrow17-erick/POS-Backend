@@ -12,6 +12,9 @@ import { SeedModule } from './seed/seed.module';
 import { SuscriptionModule } from './suscription/suscription.module';
 import { MailsModule } from './mails/mails.module';
 import { AzureConnectionModule } from './azure-connection/azure-connection.module';
+import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
+import { FileSystemStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 
 
 @Module({
@@ -19,6 +22,13 @@ import { AzureConnectionModule } from './azure-connection/azure-connection.modul
     ConfigModule.forRoot({
       load: [EnvConfig],
       validationSchema: EnvSchema,
+      isGlobal: true,
+    }),
+    NestjsFormDataModule.configAsync({
+      useFactory: ()=>({
+        storage: FileSystemStoredFile,
+        fileSystemStoragePath: '/tmp',
+      }),
       isGlobal: true,
     }),
     PrismaModule, 
@@ -34,6 +44,8 @@ import { AzureConnectionModule } from './azure-connection/azure-connection.modul
     SuscriptionModule,
     MailsModule,
     AzureConnectionModule,
+    CategoryModule,
+    ProductModule,
   ],
   providers: [],
 })

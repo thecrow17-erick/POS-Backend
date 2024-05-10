@@ -188,10 +188,10 @@ export class SuscriptionService {
 
       return response;
     } catch (err) {
+      console.log(err);
       if(err instanceof BadRequestException)
         throw err
-    
-      console.log(err);
+      
       throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
     }
   }

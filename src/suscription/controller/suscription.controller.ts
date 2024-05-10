@@ -56,8 +56,6 @@ export class SuscriptionController {
   async webhookPaymentStripe(@Body() body: Stripe.CheckoutSessionCompletedEvent){
     const statusCode = HttpStatus.OK;
     const metadata = body.data.object.metadata;
-    console.log({metadata});
-    
     const responseWebhook = await this.suscriptionService.webhookPayment(metadata)
 
     return{
