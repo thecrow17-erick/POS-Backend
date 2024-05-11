@@ -164,16 +164,18 @@ export class ProductService {
     try {
       const findProductId = await this.findProducId(id,{});
       
-      const findProduct = await this.findProduct({
-        where:{
-          name: body.name,
-          id: {
-            not: id
+      if(body.name){
+        const findProduct = await this.findProduct({
+          where:{
+            name: body.name,
+            id: {
+              not: id
+            }
           }
-        }
-      });
-      if(findProduct)
-        throw new BadRequestException(`product ${findProduct.name} in used`);
+        });
+        if(findProduct)
+          throw new BadRequestException(`product ${findProduct.name} in used`);  
+      }
       let fileName: string[];
       if(body.photo)
         fileName = [uuid()+"."+body.photo.extension];
