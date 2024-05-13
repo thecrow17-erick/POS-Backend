@@ -16,6 +16,7 @@ import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { FileSystemStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { ProviderModule } from './provider/provider.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { ProviderModule } from './provider/provider.module';
       }),
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     PrismaModule, 
     CommonModule, 
     BranchModule, 

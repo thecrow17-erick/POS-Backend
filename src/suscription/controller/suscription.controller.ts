@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { SuscriptionService } from '../service/suscription.service';
 import { QueryCommonDto } from '../../common/dto/query-common.dto';
 import { SuscriptionCreateDto } from '../dto';
@@ -35,6 +35,28 @@ export class SuscriptionController {
     }
   } 
   
+  @Get(':id')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async findSuscription(@Param('id',ParseIntPipe)id: number){
+    const statusCode = HttpStatus.ACCEPTED;
+    const suscription = await this.suscriptionService.findSuscriptionId(id,{
+      select:{
+        id: true,
+        duracion: true,
+        price: true,
+        name: true,
+      }
+    })
+
+    return {
+      statusCode,
+      message: `find id ${id} suscription`,
+      data: {
+        suscription
+      }
+    }
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthSaasGuard)

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from '../service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FormDataRequest } from 'nestjs-form-data';
@@ -27,4 +27,9 @@ export class UsersController {
     }
   }
 
-}
+
+  @Get("schedule")
+  async getSchedule(){
+    return this.userService.getDate();
+  }
+} 

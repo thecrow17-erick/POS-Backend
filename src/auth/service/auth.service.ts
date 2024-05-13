@@ -5,8 +5,10 @@ import * as bcrypt  from 'bcrypt';
 
 import { UsersService } from 'src/users/service';
 import { LoginUser } from '../dto';
-import { PayloadToken } from '../interface';
+import { PayloadToken, PayloadTokenTenant } from '../interface';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from 'src/prisma';
+import { roles } from 'src/constants';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService : ConfigService,
+    private readonly prisma : PrismaService,    
   ){}
 
   async loginSaaS(body: LoginUser){
@@ -38,7 +41,7 @@ export class AuthService {
       }
 
       const token = this.signJWT({
-        expires: "6h",
+        expires: 10 * 24 * 60 * 60,
         payload,
       })
 
@@ -54,6 +57,58 @@ export class AuthService {
     }
   }
 
+
+  async loginService(body: LoginUser, tenantId: number){
+    try {
+      const user = await this.userService.findUser({
+        where: {
+          email: body.email,
+        },
+      })
+      
+      if(!user)
+        throw new BadRequestException("user not found")
+
+      const findUserTenant = await this.prisma.memberTenant.findFirst({
+        where:{
+          tenantId,
+          userId: user.id
+        },
+        select:{
+          rol: true,
+          passwordTenant: true,
+          tenant: true,
+        }
+      })  
+      if(!findUserTenant)
+        throw new BadRequestException("user in tenant not found")
+
+      const passwordValidate =  bcrypt.compareSync(body.password, findUserTenant.passwordTenant);
+
+      if(!passwordValidate)
+        throw new BadRequestException("password not validate")
+
+      const payload: PayloadTokenTenant = {
+        userId: user.id,
+        role: findUserTenant.rol.desc as keyof typeof roles
+      }
+
+      const token = this.signJWT({
+        expires: 10 * 24 * 60 * 60,
+        payload,
+      })
+
+      return {
+        user,
+        token
+      }
+
+    } catch (error) {
+      if(error instanceof BadRequestException)
+        throw error;
+      throw new InternalServerErrorException(`server error ${JSON.stringify(error)}`)
+    }
+  }
   signJWT({
     payload,
     expires,

@@ -1,1 +1,2 @@
-export * from './IOption.user';
+export * from './option.tenant';
+export * from './option.user';

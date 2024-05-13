@@ -16,7 +16,8 @@ export class ProductService {
 
   async createProduct(createProductoDto: ProductCreateDto,tenantId: number){
     const categories: IReqCategory[] = JSON.parse(createProductoDto.categories);
-    console.log({tenantId});
+    if(categories.length === 0)
+      throw new NotFoundException("categories not found")
     
     try {
       const findProduct = await this.findProduct({

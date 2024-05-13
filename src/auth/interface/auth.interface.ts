@@ -21,8 +21,8 @@ export interface IUseTokenService {
 }
 
 export interface PayloadTokenTenant {
-  userId: string;
-  role:   roles;
+  userId:   string;
+  role:     keyof typeof roles;
 }
 
 export interface AuthTokenResultService {

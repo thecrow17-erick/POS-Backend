@@ -60,12 +60,15 @@ export class SuscriptionService {
     }
   }
 
-  async findSuscriptionId(id: number){
+  async findSuscriptionId(id: number, {
+    select
+  }:IOptionSuscription){
     try {
       const suscription = await this.prisma.suscription.findUnique({
         where:{
           id
-        }
+        },
+        select
       })
       if(!suscription)
         throw new NotFoundException(`suscription id ${id} not found`)
@@ -82,7 +85,7 @@ export class SuscriptionService {
   async paymentSuscription(createSuscription: SuscriptionCreateDto, userId: string){
     try {
       //pregunto si la suscripcion existe
-      const findSuscription = await this.findSuscriptionId(createSuscription.suscriptionId);
+      const findSuscription = await this.findSuscriptionId(createSuscription.suscriptionId,{});
       
       //PREGUNTO SI EL HOSTING NO ESTA SIENDO USADO
       const findHosting = await this.prisma.tenant.findFirst({
@@ -143,7 +146,7 @@ export class SuscriptionService {
         userId: body.userId
       } 
       const saltOrRounds = bcrypt.genSaltSync(10)
-      const suscriptionFind = await this.findSuscriptionId(dataBody.suscriptionId);
+      const suscriptionFind = await this.findSuscriptionId(dataBody.suscriptionId,{});
       const response = await this.prisma.$transaction(async(tx)=>{
         const timeNow = new Date();
         const startTime =timeNow;
