@@ -13,6 +13,14 @@ export const EnvConfig = () => ({
   accout_name_storage: process.env.ACCOUNT_NAME_STORAGE,
   key_account_storage: process.env.KEY_ACCOUNT_STORAGE,
   account_host_storage: process.env.ACCOUT_HOST_STORAGE,
-  conection_string_storage: process.env.CONECTION_STRING_STORAGE
+  conection_string_storage: process.env.CONECTION_STRING_STORAGE,
+  db_host: process.env.DB_HOST,
+  db_port: process.env.DB_PORT,
+  db_user: process.env.DB_USER,
+  db_password: process.env.DB_PASSWORD,
+  db_name: process.env.DB_NAME,
+  backup_hour: process.env.BACKUP_HOUR,
+  backup_min: process.env.BACKUP_MIN,
+  backup_month: process.env.BACKUP_MONTH,
 })
 

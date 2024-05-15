@@ -5,7 +5,6 @@ import { QueryCommonDto } from 'src/common';
 import { Request } from 'express';
 
 @Controller('tenant')
-@UseGuards(TenantGuard)
 export class TenantController {
 
   constructor(
@@ -19,14 +18,12 @@ export class TenantController {
     const statusCode = HttpStatus.OK;
     const {limit,skip} = query;
     const userId = req.UserId;
-    const tenantId = req.tenantId;
     const [tenants, total] = await Promise.all([
       this.tenantService.getAllTenants({
         skip,
         take: limit,
         where:{
           userId,
-          tenantId
         },
         select:{
           rol:{
@@ -47,7 +44,6 @@ export class TenantController {
       this.tenantService.countTenants({
         where:{
           userId,
-          tenantId
         }
       })
     ])

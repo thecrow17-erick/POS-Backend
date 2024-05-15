@@ -14,4 +14,12 @@ export const EnvSchema = Joi.object({
   KEY_ACCOUNT_STORAGE : Joi.string().required(),
   ACCOUT_HOST_STORAGE : Joi.string().required(),
   CONECTION_STRING_STORAGE: Joi.string().required(),
+  DB_HOST: Joi.string().required(),
+  DB_PORT: Joi.number().default(5432),
+  DB_USER:Joi.string().required(),
+  DB_PASSWORD:Joi.string().required(),
+  DB_NAME:Joi.string().required(),
+  BACKUP_HOUR:Joi.number().default(2),
+  BACKUP_MIN:Joi.number().default(0),
+  BACKUP_MONTH:Joi.number().default(3),
 })
