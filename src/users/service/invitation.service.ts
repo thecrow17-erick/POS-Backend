@@ -6,6 +6,8 @@ import { MailsService } from 'src/mails/mails.service';
 import { ConfigService } from '@nestjs/config';
 import * as schedule from 'node-schedule';
 import { addDays } from 'date-fns';
+import {v4 as uuid} from 'uuid'
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class InvitationService {
   constructor(
@@ -142,6 +144,187 @@ export class InvitationService {
     }
   }
 
-  
+  async acceptInvitation(invitationId: number, userId: string){
+    try {
+      const findInvitationId = await this.prisma.invitationTenant.findFirst({
+        where:{
+          AND:[
+            {
+              id: invitationId
+            },
+            {
+              userId
+            },
+            {
+              state: "ESPERA"
+            }
+          ]
+        }
+      })
+      if(!findInvitationId) 
+        throw new NotFoundException("The invitation does not exist or its status is false or accept")
+      
+      //generla contrasenha por defecto
+      const saltOrRounds = bcrypt.genSaltSync(10)
+      const password = uuid().replace("-","").substring(0,8)
 
+      const invitationUpdate = await this.prisma.invitationTenant.update({
+        where:{
+          id: findInvitationId.id
+        },
+        data:{
+          state: "ACEPTADO"
+        },
+        select:{
+          user: true,
+          rol: true,
+          tenant: true,
+        }
+      });
+
+      const memeberTenant = await this.prisma.memberTenant.create({
+        data:{
+          tenantId: findInvitationId.tenantId,
+          userId: findInvitationId.userId,
+          passwordTenant: bcrypt.hashSync(password,saltOrRounds)
+        }
+      });
+
+      const memberRole = await this.prisma.memberRole.create({
+        data:{
+          memberId: memeberTenant.id,
+          rolId: findInvitationId.rolId
+        }
+      })
+      await this.mailService.sendCredencialesUser(
+        invitationUpdate.user.name,
+        invitationUpdate.user.email,
+        invitationUpdate.tenant.hosting,
+        `${this.configService.get<string>("frontend_url")}`,
+        password
+      )
+      return{
+        invitation: invitationUpdate,
+        memeberTenant,
+        memberRole
+      }
+    }catch(err){
+      if(err instanceof NotFoundException)
+        throw err;
+
+      throw new InternalServerErrorException(`server error ${err}`)
+    }
+  }
+
+  async resendInvitation(invitationId: number){
+    try {
+      const findInvitation = await this.prisma.invitationTenant.findFirst({
+        where:{
+          AND: [
+            {
+              id: invitationId
+            },
+            {
+              OR:[
+                {
+                  state: "VENCIDO"
+                },
+                {
+                  state: "CANCELADO"
+                }
+              ]
+            }
+          ]
+        }
+      })
+      if(!findInvitation)
+        throw new BadRequestException("the invitation cannot be forwarded")
+
+      const invitationUpdate = await this.prisma.invitationTenant.update({
+        where:{
+          id: findInvitation.id
+        },
+        data:{
+          state: "ESPERA"
+        },
+        select:{
+          id: true,
+          tenant: true,
+          rol: true,
+          user: true,
+          state: true,
+          status: true,
+        }
+      })
+      await this.mailService.sendInvitacion(
+        invitationUpdate.user.name,
+        invitationUpdate.user.email,
+        invitationUpdate.tenant.hosting,
+        `${this.configService.get<string>("frontend_url")}/invitation/${invitationUpdate.id}`
+      )
+      const afternow = addDays(new Date(),1);
+      schedule.scheduleJob(afternow, async()=>{
+        console.log("test invitation")
+        const invitationFind = await this.prisma.invitationTenant.findUnique({
+          where:{
+            id: invitationUpdate.id
+          }
+        });
+        if(invitationFind.state === "ESPERA"){
+          await this.prisma.invitationTenant.update({
+            where:{
+              id: invitationUpdate.id
+            },
+            data:{
+              state:"VENCIDO"
+            }
+          })
+        }
+      })
+
+      return invitationUpdate;
+    } catch (err) {
+      if(err instanceof BadRequestException)
+        throw err;
+
+      throw new InternalServerErrorException(`server error ${err}`)
+    }
+  }
+
+  async cancelInvitation(invitationId: number){
+    try {
+      const findInvitation = await this.prisma.invitationTenant.findFirst({
+        where:{
+          AND: [
+            {
+              id: invitationId
+            },
+            {
+              state: "ESPERA"
+            }
+          ]
+        }
+      })
+      if(!findInvitation)
+        throw new BadRequestException("You cannot cancel the invitation because it has already been canceled")
+
+      const invitationCancel = await this.prisma.invitationTenant.update({
+        where:{
+          id: findInvitation.id
+        },
+        data:{
+          state: "CANCELADO"
+        }
+      })
+
+      return {
+        invitation: invitationCancel
+      }
+    } catch (err) {
+      if(err instanceof BadRequestException)
+        throw err;
+
+      throw new InternalServerErrorException(`server error ${err}`)
+    }
+  }
 }

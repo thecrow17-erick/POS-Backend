@@ -2,11 +2,12 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { CategoryService } from '../services';
 import { QueryCommonDto } from 'src/common';
 import { Request } from 'express';
-import { TenantGuard } from 'src/auth/guard';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('category')
-@UseGuards(TenantGuard)
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class CategoryController {
 
   constructor(
@@ -15,6 +16,7 @@ export class CategoryController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Permission("view category")
   async allCategories(@Query() query: QueryCommonDto,@Req() req: Request){
     const tenantId = req.tenantId;
     const {limit,skip} = query;
@@ -44,6 +46,7 @@ export class CategoryController {
     }
   }
   @Post()
+  @Permission("create category")
   @HttpCode(HttpStatus.CREATED)
   async createCategory(@Body() body: CreateCategoryDto,@Req() req: Request){
     const tenantId = req.tenantId;
@@ -89,6 +92,7 @@ export class CategoryController {
   }
 
   @Delete(":id")
+  @Permission("view category","delete category")
   @HttpCode(HttpStatus.ACCEPTED)
   async deleteCategory(@Param('id', ParseIntPipe) id:number){
     const statusCode = HttpStatus.ACCEPTED;

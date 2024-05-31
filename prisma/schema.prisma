@@ -117,15 +117,15 @@ model InvitationTenant {
   id        Int             @id @default(autoincrement())
   tenantId  Int
   userId    String          @db.Uuid
+  user      User            @relation(fields: [userId], references: [id])
   state     StateInvitation
 
   rolId     Int
-  rol       Rol @relation(fields: [rolId],references: [id])
+  rol       Rol             @relation(fields: [rolId],references: [id])
   status    Boolean         @default(true)
   createdAt DateTime        @default(now()) @db.Timestamp(6)
   updatedAt DateTime        @default(now()) @updatedAt @db.Timestamp(6)
   tenant    Tenant          @relation(fields: [tenantId], references: [id])
-  user      User            @relation(fields: [userId], references: [id])
 }
 
 model User {
