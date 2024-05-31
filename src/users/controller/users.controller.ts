@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseInterceptors } fr
 import { UsersService } from '../service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FormDataRequest } from 'nestjs-form-data';
-import { createUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -15,7 +15,7 @@ export class UsersController {
   @Post()
   @FormDataRequest()
   @HttpCode(HttpStatus.CREATED)
-  async createUsers(@Body() body: createUserDto){
+  async createUsers(@Body() body: CreateUserDto){
     const statusCode = HttpStatus.CREATED;
     const user = await this.userService.createUser(body);
     return {

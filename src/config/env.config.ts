@@ -22,5 +22,6 @@ export const EnvConfig = () => ({
   backup_hour: process.env.BACKUP_HOUR,
   backup_min: process.env.BACKUP_MIN,
   backup_month: process.env.BACKUP_MONTH,
+  frontend_url: process.env.FRONTEND_URL
 })
 

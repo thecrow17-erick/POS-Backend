@@ -1,7 +1,7 @@
 import { IsEmail, IsOptional, IsPhoneNumber, IsString, MinLength } from "class-validator";
 import { HasMimeType, IsFile, MaxFileSize, MemoryStoredFile } from "nestjs-form-data";
 
-export class createUserDto{
+export class CreateUserDto{
   
   @IsPhoneNumber("BO")
   @IsString()

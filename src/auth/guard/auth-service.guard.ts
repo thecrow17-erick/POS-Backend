@@ -4,7 +4,7 @@ import { UsersService } from 'src/users/service';
 import { Request } from 'express';
 
 @Injectable()
-export class AuthSaasGuard implements CanActivate {
+export class AuthServiceGuard implements CanActivate {
   constructor(
     private readonly userService: UsersService
   ){}

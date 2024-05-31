@@ -3,7 +3,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { Global, Module } from '@nestjs/common';
 import { join } from 'path';
 import { MailsService } from './mails.service';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailsController } from './mails.controller';
 
 @Global()
@@ -33,6 +33,7 @@ import { MailsController } from './mails.controller';
       }),
       inject: [ConfigService],
     }),
+    ConfigModule
   ],
   providers: [MailsService],
   exports: [MailsService],

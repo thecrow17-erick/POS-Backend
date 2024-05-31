@@ -22,4 +22,5 @@ export const EnvSchema = Joi.object({
   BACKUP_HOUR:Joi.number().default(2),
   BACKUP_MIN:Joi.number().default(0),
   BACKUP_MONTH:Joi.number().default(3),
+  FRONTEND_URL: Joi.string().required(),
 })

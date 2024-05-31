@@ -32,7 +32,6 @@ export class TenantController {
                 select:{
                   id: true,
                   desc: true,
-                  permissions: true,
                 }
               },
             }

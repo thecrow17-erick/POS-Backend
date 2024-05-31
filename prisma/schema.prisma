@@ -88,6 +88,8 @@ model Rol {
 
   members     MemberRole[]
 
+  invitation  InvitationTenant[]
+
   createdAt   DateTime            @default(now()) @db.Timestamp(6)
   updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
 }
@@ -116,6 +118,9 @@ model InvitationTenant {
   tenantId  Int
   userId    String          @db.Uuid
   state     StateInvitation
+
+  rolId     Int
+  rol       Rol @relation(fields: [rolId],references: [id])
   status    Boolean         @default(true)
   createdAt DateTime        @default(now()) @db.Timestamp(6)
   updatedAt DateTime        @default(now()) @updatedAt @db.Timestamp(6)
@@ -391,6 +396,7 @@ enum StateInvitation {
   ESPERA
   ACEPTADO
   CANCELADO
+  VENCIDO
 }
 
 enum TypeAtm {

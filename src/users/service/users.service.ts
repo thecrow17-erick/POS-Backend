@@ -3,7 +3,7 @@ import * as bcrypt  from 'bcrypt';
 
 
 import { PrismaService } from 'src/prisma';
-import { createUserDto } from '../dto';
+import { CreateUserDto } from '../dto';
 import { IOptionUser } from '../interface';
 import { MailsService } from 'src/mails/mails.service';
 import {addMinutes} from 'date-fns';
@@ -17,7 +17,7 @@ export class UsersService {
     private readonly mailsService: MailsService,
   ){}
   
-  async createUser(body: createUserDto){
+  async createUser(body: CreateUserDto){
     const saltOrRounds = bcrypt.genSaltSync(10)
     try {
       const findUser = await this.findUser({
@@ -77,6 +77,18 @@ export class UsersService {
       throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
     }
   }
+  async countUsers({
+    where,
+  }: IOptionUser){
+    try {
+      const FindUser = await this.prisma.user.count({
+        where,
+      })
+      return FindUser;
+    } catch (err) {
+      throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
+    }
+  }
 
   async findIdUser(id: string){
     try {
@@ -90,6 +102,27 @@ export class UsersService {
       throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
     }
   }
+
+  async findAllUser({
+    where,
+    select,
+    orderBy,
+    skip,
+    take
+  }: IOptionUser){
+    try {
+      const FindUser = await this.prisma.user.findMany({
+        where,
+        select,
+        orderBy,
+        skip,
+        take
+      })
+      return FindUser;
+    } catch (err) {
+      throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
+    }
+  }  
 
   async getDate(){
     const now = new Date();

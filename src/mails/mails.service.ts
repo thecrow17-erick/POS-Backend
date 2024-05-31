@@ -2,13 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateMailDto } from './dto/create-mail.dto';
 import { UpdateMailDto } from './dto/update-mail.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailsService {
-  constructor(private mailService: MailerService) {}
+  constructor(
+    private mailService: MailerService,
+    private readonly configService:ConfigService
+  ) {}
 
   async sendUserConfirmation(user: string, email: string) {
-    const url = `https://www.youtube.com/watch?v=L4tCfUbicfo`;
+    const url = this.configService.get<string>("frontend_url");
     await this.mailService.sendMail({
       to: email,
       subject: 'Bienvenido a POS',

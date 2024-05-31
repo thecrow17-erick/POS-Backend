@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min } from 'class-validator';
+import { IsOptional, IsInt, Min, IsString, MinLength } from 'class-validator';
 
 export class QueryCommonDto {
 
@@ -11,5 +11,10 @@ export class QueryCommonDto {
   @IsInt()
   @Min(1)
   limit?: number;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  search? : string;
 }
 
