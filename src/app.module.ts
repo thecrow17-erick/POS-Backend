@@ -18,6 +18,7 @@ import { FileSystemStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { ProviderModule } from './provider/provider.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BackupModule } from './backup/backup.module';
+import { LogModule } from './log/log.module';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { BackupModule } from './backup/backup.module';
     ProductModule,
     ProviderModule,
     BackupModule,
+    LogModule,
   ],
   providers: [],
 })
