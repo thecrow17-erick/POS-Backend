@@ -13,7 +13,8 @@ import { MailsModule } from 'src/mails/mails.module';
     PrismaModule,
     SeedModule,
     UsersModule,
-    MailsModule
+    MailsModule,
+    SeedModule
   ]
 })
 export class SuscriptionModule {

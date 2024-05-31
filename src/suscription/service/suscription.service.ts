@@ -9,8 +9,8 @@ import { PrismaService } from 'src/prisma';
 import { IOptionSuscription } from '../interface';
 import { SuscriptionCreateDto } from '../dto';
 import { roles } from 'src/constants';
-import { SeedService } from '../../seed/service/seed.service';
 import { MailsService } from 'src/mails/mails.service';
+import { SeedService } from 'src/seed/service';
 
 @Injectable()
 export class SuscriptionService {
@@ -151,7 +151,7 @@ export class SuscriptionService {
         const timeNow = new Date();
         const startTime =timeNow;
         const endTime =addDays(timeNow, suscriptionFind.duracion);
-
+        //busca si el usuario existe
         const userFind = await tx.user.findUnique({
           where:{
             id: dataBody.userId
@@ -160,12 +160,13 @@ export class SuscriptionService {
         if(!userFind)
           throw new NotFoundException("user not found")
 
+        //crea el tenant
         const tenatCreate = await tx.tenant.create({
           data:{
             hosting: dataBody.hosting,
           }
         });
-
+        //paga lo que cuesta el tenant
         const payment = await tx.paymentMembreship.create({
           data:{
             tenantId: tenatCreate.id,
@@ -175,23 +176,47 @@ export class SuscriptionService {
           }
         })
 
+        //el rol administrador por defecto de cada tenant
         const userRole: keyof typeof roles = 'Administrador';
 
-        const roleId = await tx.rol.findFirst({
-          where:{
-            desc: userRole
+        //crea el rol 
+        const roleId = await tx.rol.create({
+          data:{
+            desc: userRole,
+            tenantId: tenatCreate.id
           }
         })
-
+        //generla contrasenha por defecto
         const password = uuid().replace("-","").substring(0,8)
+        //lo pone como miembro al creador del tenant
         const memberTenantCreate = await tx.memberTenant.create({
           data:{
             passwordTenant: bcrypt.hashSync(password,saltOrRounds),
-            rolId: roleId.id,
             tenantId: tenatCreate.id,
             userId: dataBody.userId
           }
         })
+        //busca todos los permisos para asignarle al administrador
+        const findPermissions = await tx.permission.findMany();
+        //verifica si hay permisos
+        if(findPermissions.length === 0)
+          throw new BadRequestException("permission seed is not already inserted")
+
+        //inserta todos los permisos al administrador del tenant
+        await tx.rolePermission.createMany({
+          data: findPermissions.map(p => ({
+            rolId: roleId.id,
+            permissionid: p.id
+          }))
+        })
+        //agrega el rol admin al creador del tenant
+        await tx.memberRole.create({
+          data:{
+            memberId: memberTenantCreate.id,
+            rolId: roleId.id
+          }
+        })
+        //enviar el email que compro el  tenant
         await this.mailsService.sendCredencialesCliente(
           userFind.name,
           userFind.email,
@@ -206,7 +231,6 @@ export class SuscriptionService {
           payment
         }
       })
-      await this.seedService.seedPermission(response.tenant.id);
       return response;
     } catch (err) {
       console.log(err);

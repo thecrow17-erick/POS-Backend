@@ -28,7 +28,7 @@ export class ControlService {
           employeeId: "dawawddqwaqwer",
           monto: bodyControlDto.monto,
           atmId: bodyControlDto.atmId,
-          type: "Apertura"
+          type: "APERTURA"
         }
       })
       return openAtm;
@@ -56,7 +56,7 @@ export class ControlService {
           employeeId: "dasasdfasas",
           monto: bodyControlDto.monto,
           atmId: bodyControlDto.atmId,
-          type: "Cierre"
+          type: "CIERRE"
         }
       })
       return openAtm;

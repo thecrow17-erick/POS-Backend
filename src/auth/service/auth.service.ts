@@ -75,7 +75,6 @@ export class AuthService {
           userId: user.id
         },
         select:{
-          rol: true,
           passwordTenant: true,
           tenant: true,
         }
@@ -90,7 +89,6 @@ export class AuthService {
 
       const payload: PayloadTokenTenant = {
         userId: user.id,
-        role: findUserTenant.rol.desc as keyof typeof roles
       }
 
       const token = this.signJWT({

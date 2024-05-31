@@ -13,6 +13,7 @@ import { PrismaModule } from 'src/prisma';
     PrismaModule,
     UsersModule, 
     JwtModule,
-    ConfigModule]
+    ConfigModule
+  ]
 })
 export class AuthModule {}

@@ -15,7 +15,7 @@ model Suscription {
   updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
   status      Boolean             @default(true)
   price       Decimal             @db.Decimal(10, 2)
-  membreshits paymentMembreship[]
+  membreshits PaymentMembreship[]
 }
 
 model Tenant {
@@ -31,16 +31,16 @@ model Tenant {
   City        City[]
   Client      Client[]
   invitations InvitationTenant[]
-  Permission  Permission[]
+  roles         Rol[]
   Product     Product[]
   Provider    Provider[]
   Sales       Sales[]
   Stock       Stock[]
-  users       memberTenant[]
-  membreshits paymentMembreship[]
+  users       MemberTenant[]
+  membreshits PaymentMembreship[]
 }
 
-model paymentMembreship {
+model PaymentMembreship {
   tenantId      Int
   suscriptionId Int
   endTime       DateTime    @db.Timestamp(6)
@@ -51,45 +51,65 @@ model paymentMembreship {
   @@id([tenantId, suscriptionId])
 }
 
-model memberTenant {
+model MemberTenant {
+  id             Int    @id @default(autoincrement())
+  passwordTenant String @db.Text
+
   userId         String @db.Uuid
-  tenantId       Int
-  passwordTenant String
-  rolId          Int
-  rol            Rol    @relation(fields: [rolId], references: [id])
-  tenant         Tenant @relation(fields: [tenantId], references: [id])
   user           User   @relation(fields: [userId], references: [id])
 
-  @@id([userId, tenantId])
+  tenantId       Int
+  tenant         Tenant @relation(fields: [tenantId], references: [id])
+
+  roles          MemberRole[]
 }
 
+model MemberRole{
+  memberId      Int
+  member        MemberTenant @relation(fields: [memberId],references: [id])
+
+  rolId         Int 
+  rol           Rol @relation(fields: [rolId],references: [id])
+
+  @@id([memberId,rolId])
+
+}
+
+
 model Rol {
-  id           Int            @id @default(autoincrement())
-  desc         String         @db.VarChar(60)
-  permissions  Permission[]
-  memberTenant memberTenant[]
+  id          Int            @id @default(autoincrement())
+  desc        String         @db.VarChar(60)
+  status      Boolean        @default(true)
+
+  tenantId    Int
+  tenant      Tenant @relation(fields: [tenantId], references: [id])
+
+  permissions RolePermission[]
+
+  members     MemberRole[]
+
+  createdAt   DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model RolePermission{
+  rolId         Int  
+  rol           Rol @relation(fields: [rolId],references: [id])
+
+  permissionid  Int
+  permission    Permission @relation(fields: [ permissionid],references: [id])
+
+  @@id([rolId,permissionid])
 }
 
 model Permission {
   id        Int     @id @default(autoincrement())
-  rolId     Int
-  moduleId  Int
-  get       Boolean
-  create    Boolean
-  edit      Boolean
-  delete    Boolean
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  tenantId  Int      @db.Integer
-  module    Module   @relation(fields: [moduleId], references: [id])
-  rol       Rol      @relation(fields: [rolId], references: [id])
-  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  desc      String  @db.VarChar(60)
+
+  roles     RolePermission[]
 }
 
-model Module {
-  id          Int          @id @default(autoincrement())
-  name        String       @db.VarChar(60)
-  permissions Permission[]
-}
+
 
 model InvitationTenant {
   id        Int             @id @default(autoincrement())
@@ -116,7 +136,7 @@ model User {
   buys        Buys[]
   controlATM  ControlATM[]
   invitations InvitationTenant[]
-  tenants     memberTenant[]
+  tenants     MemberTenant[]
 }
 
 model Category {
@@ -185,6 +205,7 @@ model DetailsBuys {
   buyId     Int
   cant      Int
   import    Decimal  @db.Decimal(10, 2)
+  price     Decimal  @db.Decimal(10,2)
   createdAt DateTime @default(now()) @db.Timestamp(6)
   buy       Buys     @relation(fields: [buyId], references: [id])
   product   Product  @relation(fields: [productId], references: [id])
@@ -297,6 +318,10 @@ model Sales {
   atmId           Int
   clientId        String         @db.Uuid
   paymentMethodId Int
+  state           StateSale
+  statePay        StatePay
+  saleReturn      SalesReturn?
+  paymentCard     PaymentCard?
   createdAt       DateTime       @default(now()) @db.Timestamp(6)
   updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamp(6)
   tenantId        Int
@@ -305,6 +330,30 @@ model Sales {
   client          Client         @relation(fields: [clientId], references: [id])
   paymentMethod   PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
   Tenant          Tenant         @relation(fields: [tenantId], references: [id])
+}
+
+model PaymentCard{
+  id              Int @id @default(autoincrement())
+  code            String @db.Char(20)
+  status          Boolean @default(true)
+
+  saleId          Int @unique
+  sale            Sales @relation(fields: [saleId],references: [id])
+
+  createdAt       DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+model SalesReturn{
+  id              Int @id @default(autoincrement())
+  desc            String @db.Text
+  status          Boolean @default(true)
+
+  saleId          Int @unique
+  sale            Sales @relation(fields: [saleId],references: [id])
+
+  createdAt       DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamp(6)
 }
 
 model Client {
@@ -327,13 +376,24 @@ model PaymentMethod {
   sales       Sales[]
 }
 
+enum StateSale {
+  DEVOLUCION
+  VENDIDO
+}
+
+enum StatePay {
+  EFECTIVO
+  TARJETA
+  QR
+}
+
 enum StateInvitation {
-  Espera
-  Aceptado
-  Cancelado
+  ESPERA
+  ACEPTADO
+  CANCELADO
 }
 
 enum TypeAtm {
-  Apertura
-  Cierre
+  APERTURA
+  CIERRE
 }

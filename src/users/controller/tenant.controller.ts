@@ -26,19 +26,18 @@ export class TenantController {
           userId,
         },
         select:{
-          rol:{
+          roles: {
             select:{
-              id: true,
-              desc: true
+              rol: {
+                select:{
+                  id: true,
+                  desc: true,
+                  permissions: true,
+                }
+              },
             }
           },
-          tenant:{
-            select:{
-              id: true,
-              hosting: true,
-              createdAt: true,
-            }
-          },
+          tenant:true
         }
       }),
       this.tenantService.countTenants({
@@ -49,10 +48,11 @@ export class TenantController {
     ])
 
     const allTenants = tenants.map(t => ({
-      rol: t.rol,
-      tenant:{
+      roles: t.roles,
+      tenants: {
         ...t.tenant,
-        createdAt: t.tenant.createdAt.toLocaleString()
+        createdAt: t.tenant.createdAt.toLocaleString(),
+        updatedAt: t.tenant.updatedAt.toLocaleString(),
       }
     }));
 

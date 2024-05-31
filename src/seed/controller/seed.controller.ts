@@ -13,10 +13,8 @@ export class SeedController {
   async seedAll(){
     const statusCode = HttpStatus.CREATED;
     const messages = await Promise.all([
-      this.seedService.seedRol(),
-      this.seedService.seedModule(),
+      this.seedService.seedPermission(),
       this.seedService.seedSuscription(),
-      this.seedService.seedPaymentMethod(),
     ])
     return {
       message: messages,

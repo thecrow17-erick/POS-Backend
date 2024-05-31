@@ -3,10 +3,10 @@ import { Prisma } from "@prisma/client";
 export interface IOptionMemberTenant{
   skip?: number,
   take?: number,
-  where?: Prisma.memberTenantWhereInput,
-  select?: Prisma.memberTenantSelect,
-  orderBy? :Prisma.memberTenantOrderByWithRelationInput,
-  cursor?: Prisma.memberTenantWhereUniqueInput,
+  where?: Prisma.MemberTenantWhereInput,
+  select?: Prisma.MemberTenantSelect,
+  orderBy? :Prisma.MemberTenantOrderByWithRelationInput,
+  cursor?: Prisma.MemberTenantWhereUniqueInput,
   distinct?: Prisma.MemberTenantScalarFieldEnum | Prisma.MemberTenantScalarFieldEnum[],
-  include?:   Prisma.memberTenantInclude,
+  include?:   Prisma.MemberTenantInclude,
 }
