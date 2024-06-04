@@ -77,7 +77,7 @@ export class InvitationController {
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;
     const {skip,limit} = query;
-    const [allInvitations,total] = await Promise.all([
+    const [invitations,total] = await Promise.all([
       this.invitationService.allInvitation({
         where:{
           tenantId,
@@ -99,6 +99,14 @@ export class InvitationController {
         }
       })
     ])
+
+    const allInvitations = invitations.map(invitation => ({
+      ...invitation,
+      createdAt: invitation.createdAt.toLocaleString(),
+      updatedAt: invitation.updatedAt.toLocaleString(),
+    }))
+
+
     return {
       statusCode,
       message: "all invitation user",
