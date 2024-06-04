@@ -83,7 +83,15 @@ export class InvitationController {
           tenantId,
         },
         skip,
-        take: limit
+        take: limit,
+        select:{
+          id: true,
+          rol: true,
+          state: true,
+          user: true,
+          createdAt: true,
+          updatedAt: true
+        }
       }),
       this.invitationService.countInvitation({
         where:{
@@ -93,7 +101,7 @@ export class InvitationController {
     ])
     return {
       statusCode,
-      message: "find user",
+      message: "all invitation user",
       data:{
         allInvitations,
         total

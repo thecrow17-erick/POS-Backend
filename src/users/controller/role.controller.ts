@@ -1,14 +1,13 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { TenantGuard } from 'src/auth/guard';
-import { IsAdminGuard } from 'src/auth/guard/is-admin.guard';
 import { roles } from 'src/constants';
 import { RoleService } from '../service/role.service';
 import { QueryCommonDto } from 'src/common';
 import { CreateRolDto } from '../dto';
 
 @Controller('role')
-@UseGuards(TenantGuard,IsAdminGuard) 
+@UseGuards(TenantGuard) 
 export class RoleController {
   constructor(
     private readonly roleService: RoleService
