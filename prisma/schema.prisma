@@ -61,19 +61,13 @@ model MemberTenant {
   tenantId       Int
   tenant         Tenant @relation(fields: [tenantId], references: [id])
 
-  roles          MemberRole[]
+  rolId          Int
+  rol            Rol @relation(fields: [rolId],references: [id])
+
+  createdAt      DateTime @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime @default(now()) @db.Timestamp(6) @updatedAt
 }
 
-model MemberRole{
-  memberId      Int
-  member        MemberTenant @relation(fields: [memberId],references: [id])
-
-  rolId         Int 
-  rol           Rol @relation(fields: [rolId],references: [id])
-
-  @@id([memberId,rolId])
-
-}
 
 
 model Rol {
@@ -86,7 +80,7 @@ model Rol {
 
   permissions RolePermission[]
 
-  members     MemberRole[]
+  members     MemberTenant[]
 
   invitation  InvitationTenant[]
 
@@ -100,7 +94,7 @@ model RolePermission{
 
   permissionid  Int
   permission    Permission @relation(fields: [ permissionid],references: [id])
-
+  
   @@id([rolId,permissionid])
 }
 

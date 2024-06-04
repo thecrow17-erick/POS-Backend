@@ -48,5 +48,8 @@ export class UserRoleService {
     }
   }
 
+  async updateUserRole(){
+    
+  }
   
 }

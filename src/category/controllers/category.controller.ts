@@ -45,9 +45,10 @@ export class CategoryController {
       }
     }
   }
+  
   @Post()
-  @Permission("create category")
   @HttpCode(HttpStatus.CREATED)
+  @Permission("create category")
   async createCategory(@Body() body: CreateCategoryDto,@Req() req: Request){
     const tenantId = req.tenantId;
     const statusCode = HttpStatus.OK
@@ -64,6 +65,7 @@ export class CategoryController {
 
   @Get(":id")
   @HttpCode(HttpStatus.ACCEPTED)
+  @Permission("view category")
   async findCategory(@Param('id', ParseIntPipe) id:number){
     const statusCode = HttpStatus.ACCEPTED;
     const category = await this.categoryService.findCategoryId(id)
@@ -78,6 +80,7 @@ export class CategoryController {
   
   @Patch(":id")
   @HttpCode(HttpStatus.ACCEPTED)
+  @Permission("edit category","view category")
   async updateCategory(@Param('id', ParseIntPipe) id:number,@Body() body:UpdateCategoryDto){
     const statusCode = HttpStatus.ACCEPTED;
     const category = await this.categoryService.updateCategory(id,body)

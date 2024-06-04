@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthServiceGuard, TenantGuard } from 'src/auth/guard';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { roles } from 'src/constants';
 import { RoleService } from '../service/role.service';
 import { QueryCommonDto } from 'src/common';
 import { CreateRolDto } from '../dto';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('role')
-@UseGuards(TenantGuard,AuthServiceGuard) 
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard) 
 export class RoleController {
   constructor(
     private readonly roleService: RoleService
@@ -15,6 +16,7 @@ export class RoleController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Permission("ver roles")
   async allRoles(@Query() query: QueryCommonDto,  @Req() req: Request){
     const statusCode = HttpStatus.OK
     const tenantId = req.tenantId;
@@ -59,6 +61,7 @@ export class RoleController {
   }
   @Get("permission")
   @HttpCode(HttpStatus.OK)
+  @Permission("ver roles")
   async allPermission(@Query() query: QueryCommonDto){
     const statusCode = HttpStatus.OK
     const {limit,skip,search} = query;
@@ -94,6 +97,7 @@ export class RoleController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Permission("crear roles")
   async createRol(@Body() createRolDto:CreateRolDto,@Req() req:Request){
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
@@ -106,6 +110,7 @@ export class RoleController {
 
   @Delete(":id")
   @HttpCode(HttpStatus.OK)
+  @Permission("ver roles", "eliminar roles")
   async deleteRol(@Param("id",ParseIntPipe) id:number,@Req() req:Request){
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;

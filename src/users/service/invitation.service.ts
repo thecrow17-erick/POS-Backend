@@ -144,6 +144,34 @@ export class InvitationService {
     }
   }
 
+  async findByIdInvitation(invitationId: number,userId: string){
+    try {
+      const findInvitationId= await this.prisma.invitationTenant.findUnique({
+        where:{
+          id: invitationId,
+          state: "ESPERA",
+          userId          
+        },
+        select:{
+          rol: true,
+          id: true,
+          state: true,
+          createdAt: true,
+          tenant: true,
+          user: true,
+        }
+      })
+      if(!findInvitationId)
+        throw new NotFoundException("the invitation is expired")
+
+      return findInvitationId;
+    } catch (err) {
+      if(err instanceof NotFoundException)
+        throw err;
+      throw new InternalServerErrorException(`server error ${err}`)
+    }
+  }
+
   async acceptInvitation(invitationId: number, userId: string){
     try {
       const findInvitationId = await this.prisma.invitationTenant.findFirst({
@@ -186,16 +214,10 @@ export class InvitationService {
         data:{
           tenantId: findInvitationId.tenantId,
           userId: findInvitationId.userId,
-          passwordTenant: bcrypt.hashSync(password,saltOrRounds)
-        }
-      });
-
-      const memberRole = await this.prisma.memberRole.create({
-        data:{
-          memberId: memeberTenant.id,
+          passwordTenant: bcrypt.hashSync(password,saltOrRounds),
           rolId: findInvitationId.rolId
         }
-      })
+      });
       await this.mailService.sendCredencialesUser(
         invitationUpdate.user.name,
         invitationUpdate.user.email,
@@ -206,7 +228,6 @@ export class InvitationService {
       return{
         invitation: invitationUpdate,
         memeberTenant,
-        memberRole
       }
     }catch(err){
       if(err instanceof NotFoundException)
@@ -267,10 +288,15 @@ export class InvitationService {
         console.log("test invitation")
         const invitationFind = await this.prisma.invitationTenant.findUnique({
           where:{
-            id: invitationUpdate.id
+            id: invitationUpdate.id,
+            OR: [
+              {
+                state: "ESPERA"
+              }
+            ]
           }
         });
-        if(invitationFind.state === "ESPERA"){
+        if(invitationFind){
           await this.prisma.invitationTenant.update({
             where:{
               id: invitationUpdate.id

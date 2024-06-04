@@ -26,14 +26,10 @@ export class TenantController {
           userId,
         },
         select:{
-          roles: {
+          rol: {
             select:{
-              rol: {
-                select:{
-                  id: true,
-                  desc: true,
-                }
-              },
+              id: true,
+              desc: true,
             }
           },
           tenant:true
@@ -47,8 +43,8 @@ export class TenantController {
     ])
 
     const allTenants = tenants.map(t => ({
-      roles: t.roles,
-      tenants: {
+      ...t,
+      tenant:{
         ...t.tenant,
         createdAt: t.tenant.createdAt.toLocaleString(),
         updatedAt: t.tenant.updatedAt.toLocaleString(),

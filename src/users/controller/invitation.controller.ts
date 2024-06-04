@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { TenantGuard,IsAdminGuard, AuthSaasGuard } from 'src/auth/guard';
+import { TenantGuard, AuthSaasGuard, AuthServiceGuard, RolesGuard } from 'src/auth/guard';
 import { UsersService } from '../service';
 import { QueryCommonDto } from 'src/common';
 import { Request } from 'express';
 import { InvitationService } from '../service/invitation.service';
 import { CreateInvitationDto } from '../dto';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('invitation')
 export class InvitationController {
@@ -15,48 +16,103 @@ export class InvitationController {
   ){}
   
   @Get("search-user")
-  @UseGuards(TenantGuard,IsAdminGuard) 
   @HttpCode(HttpStatus.OK)
-  async findUserInvitation(@Query() query: QueryCommonDto){
+  @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
+  @Permission("enviar invitaciones")     
+  async findUserInvitation(@Query() query: QueryCommonDto, @Req() req: Request){
     const statusCode = HttpStatus.OK;
+    const tenantId = req.tenantId;
+    const userId = req.UserId;
     const {search,skip,limit} = query;
     const [allUsers,total] = await Promise.all([
       this.userService.findAllUser({
         where: {
-          OR:[
+          AND:[
             {
-              name:{
-                contains: search,
-                mode: "insensitive"
+              tenants:{
+                every:{
+                  tenantId:{
+                    not: tenantId
+                  },
+                  userId:{
+                    not: userId
+                  }
+                }
+              },
+            },
+            {
+              invitations:{
+                every:{
+                  tenantId:{
+                    not: tenantId
+                  }
+                }
               }
             },
             {
-              email: {
-                contains: search,
-                mode: "insensitive"
-              },
+              OR:[
+                {
+                  name:{
+                    contains: search,
+                    mode: "insensitive"
+                  }
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: "insensitive"
+                  },
+                }
+              ] 
             }
           ]
+          
         },
         skip,
         take: limit
       }),
       this.userService.countUsers({
         where: {
-          OR:[
+          AND:[
             {
-              name:{
-                contains: search,
-                mode: "insensitive"
+              tenants:{
+                every:{
+                  tenantId:{
+                    not: tenantId
+                  },
+                  userId:{
+                    not: userId
+                  }
+                }
+              },
+            },
+            {
+              invitations:{
+                every:{
+                  tenantId:{
+                    not: tenantId
+                  }
+                }
               }
             },
             {
-              email: {
-                contains: search,
-                mode: "insensitive"
-              },
+              OR:[
+                {
+                  name:{
+                    contains: search,
+                    mode: "insensitive"
+                  }
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: "insensitive"
+                  },
+                }
+              ] 
             }
           ]
+          
         }
       })
     ])
@@ -69,10 +125,11 @@ export class InvitationController {
       }
     }
   }
-
+  
   @Get()
-  @UseGuards(TenantGuard,IsAdminGuard) 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
+  @Permission("ver invitaciones")
   async allInvitation(@Query() query: QueryCommonDto, @Req() req: Request) {
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;
@@ -118,8 +175,9 @@ export class InvitationController {
   }
 
   @Post()
-  @UseGuards(TenantGuard,IsAdminGuard) 
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
+  @Permission("enviar invitaciones")
   async createInvitation(@Body() createInvitationDto:CreateInvitationDto,@Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
@@ -132,6 +190,18 @@ export class InvitationController {
     }
   }
   
+  @Get(":id")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthSaasGuard)
+  async findByIdInvitation(@Param('id',ParseIntPipe) id:number , @Req() req:Request){
+    const statusCode = HttpStatus.OK;
+    const userId = req.UserId;
+    return {
+      statusCode,
+      message: "view invitation",
+      data: await this.invitationService.findByIdInvitation(id,userId)
+    }
+  }
 
   @Patch("accept/:id")
   @HttpCode(HttpStatus.OK)
@@ -148,7 +218,8 @@ export class InvitationController {
 
   @Patch("resend/:id")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(TenantGuard,IsAdminGuard)
+  @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
+  @Permission("enviar invitaciones")
   async reseendInvitation(@Param('id',ParseIntPipe) id:number){
     const statusCode = HttpStatus.OK;
     return {
@@ -160,7 +231,8 @@ export class InvitationController {
 
   @Delete("cancel/:id")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(TenantGuard,IsAdminGuard)
+  @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
+  @Permission("cancelar invitacion")
   async cancelInvitation(@Param('id',ParseIntPipe) id:number){
     const statusCode = HttpStatus.OK;
     return {

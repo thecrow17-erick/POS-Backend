@@ -10,7 +10,6 @@ import { IOptionSuscription } from '../interface';
 import { SuscriptionCreateDto } from '../dto';
 import { roles } from 'src/constants';
 import { MailsService } from 'src/mails/mails.service';
-import { SeedService } from 'src/seed/service';
 
 @Injectable()
 export class SuscriptionService {
@@ -18,7 +17,6 @@ export class SuscriptionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
-    private readonly seedService: SeedService,
     private readonly mailsService: MailsService
   ){
     this.stripe = new Stripe(this.configService.get<string>("stripe_key"))
@@ -193,7 +191,8 @@ export class SuscriptionService {
           data:{
             passwordTenant: bcrypt.hashSync(password,saltOrRounds),
             tenantId: tenatCreate.id,
-            userId: dataBody.userId
+            userId: dataBody.userId,
+            rolId: roleId.id
           }
         })
         //busca todos los permisos para asignarle al administrador
@@ -208,13 +207,6 @@ export class SuscriptionService {
             rolId: roleId.id,
             permissionid: p.id
           }))
-        })
-        //agrega el rol admin al creador del tenant
-        await tx.memberRole.create({
-          data:{
-            memberId: memberTenantCreate.id,
-            rolId: roleId.id
-          }
         })
         //enviar el email que compro el  tenant
         await this.mailsService.sendCredencialesCliente(
