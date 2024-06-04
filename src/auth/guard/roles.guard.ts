@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { Observable } from 'rxjs';
 import { PrismaService } from 'src/prisma';
 
 @Injectable()
@@ -53,6 +54,8 @@ export class RolesGuard implements CanActivate {
           permission: true
         }
       })
+      console.log(findPermission)
+      console.log(findPermission.length,permissions.length)
 
       if(findPermission.length == permissions.length)
         isValid=true;

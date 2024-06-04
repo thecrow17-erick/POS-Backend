@@ -5,7 +5,6 @@ import { TenantGuard } from 'src/auth/guard';
 import { AuthService } from 'src/auth/service';
 
 @Injectable()
-@UseGuards(TenantGuard,AuthService)
 export class UserRoleService {
 
   constructor(

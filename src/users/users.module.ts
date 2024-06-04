@@ -14,11 +14,11 @@ import {
   UsersService,
 } from './service';
 import { 
-  UserRoleController,
   InvitationController,
   RoleController,
   TenantController,
-  UsersController
+  UsersController,
+  UserRoleController
 } from './controller';
 
 @Module({
