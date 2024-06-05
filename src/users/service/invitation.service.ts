@@ -10,6 +10,7 @@ import {v4 as uuid} from 'uuid'
 import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { RoleService } from './role.service';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class InvitationService {
@@ -18,7 +19,8 @@ export class InvitationService {
     private readonly mailService: MailsService,
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly logService:LogService
   ){}
 
   async allInvitation({
@@ -55,7 +57,7 @@ export class InvitationService {
     }
   }
 
-  async createInvitation(tenantId:number, createInvitationDto:CreateInvitationDto){
+  async createInvitation(tenantId:number,userId:string, createInvitationDto:CreateInvitationDto){
     try {
       const tenant = await this.prisma.tenant.findUnique({
         where:{
@@ -133,6 +135,15 @@ export class InvitationService {
             }
           })
         }
+      })
+      this.logService.log({
+        accion: `el usuario ${userId} invito a ${usersCreate.count} personas con id ${findUsers.map(u => u.id)}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Invitacion al tenant`,
+        username: userId
       })
 
       return {
@@ -230,6 +241,17 @@ export class InvitationService {
         `${this.configService.get<string>("frontend_url")}`,
         password
       )
+
+      this.logService.log({
+        accion: `el usuario ${userId} acepto la invitacion al tenant ${memeberTenant.tenantId}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: memeberTenant.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Aceptacion de invitacion`,
+        username: userId
+      })
+
       return{
         invitation: invitationUpdate,
         memeberTenant,
@@ -242,7 +264,7 @@ export class InvitationService {
     }
   }
 
-  async resendInvitation(invitationId: number){
+  async resendInvitation(invitationId: number,userId: string){
     try {
       const findInvitation = await this.prisma.invitationTenant.findFirst({
         where:{
@@ -313,6 +335,15 @@ export class InvitationService {
         }
       })
 
+      this.logService.log({
+        accion: `el usuario ${userId} reenvio la invitacion ${invitationId}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: invitationUpdate.tenant.id.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Reenviar invitacion`,
+        username: userId
+      })
       return invitationUpdate;
     } catch (err) {
       if(err instanceof BadRequestException)
@@ -322,7 +353,7 @@ export class InvitationService {
     }
   }
 
-  async cancelInvitation(invitationId: number){
+  async cancelInvitation(invitationId: number,userId: string){
     try {
       const findInvitation = await this.prisma.invitationTenant.findFirst({
         where:{
@@ -348,6 +379,16 @@ export class InvitationService {
         }
       })
 
+      this.logService.log({
+        accion: `el usuario ${userId} cancelo la invitacion ${invitationId}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: invitationCancel.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Reenviar invitacion`,
+        username: userId
+      })
+      
       return {
         invitation: invitationCancel
       }

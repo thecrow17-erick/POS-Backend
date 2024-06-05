@@ -6,15 +6,17 @@ import { PrismaService } from 'src/prisma';
 import { ProductCreateDto } from '../dto/create-product.dto';
 import { IOptionProducts, IReqCategory } from '../interface';
 import { UpdateProductDto } from '../dto';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly azureService: AzureConnectionService
+    private readonly azureService: AzureConnectionService,
+    private readonly logService: LogService
   ){}
 
-  async createProduct(createProductoDto: ProductCreateDto,tenantId: number){
+  async createProduct(createProductoDto: ProductCreateDto,userId:string,tenantId: number){
     const categories: IReqCategory[] = JSON.parse(createProductoDto.categories);
     if(categories.length === 0)
       throw new NotFoundException("categories not found")
@@ -77,6 +79,17 @@ export class ProductService {
           categories: `${productCategories.count} inserted at product`
         }
       })
+
+      this.logService.log({
+        accion: `el usuario ${userId} creo el producto ${response.productCreate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Crear producto`,
+        username: userId
+      })
+      
 
       return response;
     } catch (err) { 
@@ -158,7 +171,7 @@ export class ProductService {
     }
   }
 
-  async updateProduct(body: UpdateProductDto, id:number){
+  async updateProduct(body: UpdateProductDto,userId:string, id:number){
     let categories: IReqCategory[] = [];
     if(body.categories)
       categories = JSON.parse(body.categories);
@@ -225,6 +238,15 @@ export class ProductService {
         timeout: 2000000
       })
 
+      this.logService.log({
+        accion: `el usuario ${userId} actualizo el producto ${response.updateProduct.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: response.updateProduct.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Actualizar producto`,
+        username: userId
+      })
       return response;
     } catch (err) {
       if(err instanceof NotFoundException)
@@ -236,7 +258,7 @@ export class ProductService {
     }
   }
 
-  async deleteProduct(id:number){
+  async deleteProduct(id:number,userId:string){
     try {
       const findProduct = await this.findProducId(id,{});
 
@@ -248,7 +270,15 @@ export class ProductService {
           status: !findProduct.status
         },
       });
-
+      this.logService.log({
+        accion: `el usuario ${userId} ${deleteProduct.status? "activo":"desactivo"} el producto ${deleteProduct.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: deleteProduct.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `${deleteProduct.status? "Activar":"Desactivar"} producto`,
+        username: userId
+      })
       return deleteProduct;
     }catch (err) {
       console.log(err);

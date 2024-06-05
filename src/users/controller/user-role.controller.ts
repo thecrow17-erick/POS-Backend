@@ -89,7 +89,7 @@ export class UserRoleController {
       statusCode,
       message: "member update role",
       data: {
-        user: await this.userRoleService.updateUserRole(tenantId,id,asignInvitationDto)
+        user: await this.userRoleService.updateUserRole(tenantId,userId,id,asignInvitationDto)
       }
     }
   }
@@ -100,7 +100,6 @@ export class UserRoleController {
   async findByIdEmployee(@Param('id',ParseIntPipe) id:number , @Req() req:Request){
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;
-    const userId = req.UserId;
     const user = await this.userRoleService.findByIdMember(tenantId,id)
 
     const employee = {

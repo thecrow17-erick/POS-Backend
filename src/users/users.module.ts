@@ -20,6 +20,7 @@ import {
   UsersController,
   UserRoleController
 } from './controller';
+import { LogModule } from 'src/log/log.module';
 
 @Module({
   controllers: [UsersController, TenantController, RoleController, InvitationController, UserRoleController],
@@ -30,6 +31,7 @@ import {
     MailsModule,
     ScheduleModule,
     ConfigModule,
+    LogModule
   ],
   exports: [UsersService],
 })

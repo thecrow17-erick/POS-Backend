@@ -1,17 +1,17 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma';
 import { IOptionUserRole } from '../interface';
-import { TenantGuard } from 'src/auth/guard';
-import { AuthService } from 'src/auth/service';
 import { AsignInvitationDto } from '../dto';
 import { RoleService } from './role.service';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class UserRoleService {
 
   constructor(
     private readonly prisma:PrismaService,
-    private readonly roleService:RoleService
+    private readonly roleService:RoleService,
+    private readonly logService:LogService
   ){}
 
 
@@ -51,7 +51,7 @@ export class UserRoleService {
     }
   }
 
-  async updateUserRole(tenantId:number,memberId:number,asignInvitationDto:AsignInvitationDto){
+  async updateUserRole(tenantId:number,userId:string,memberId:number,asignInvitationDto:AsignInvitationDto){
     try {
       const findMember = await this.findByIdMember(tenantId,memberId);
       const role = await this.roleService.findRoleId(asignInvitationDto.rolId, tenantId);
@@ -63,7 +63,15 @@ export class UserRoleService {
           rolId: role.id
         }
       });
-
+      this.logService.log({
+        accion: `el usuario ${userId} actualizo el rol del miembro ${updateMemberRol.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Actualizar rol de miembro`,
+        username: userId
+      })
       return updateMemberRol;
 
     } catch (err) {

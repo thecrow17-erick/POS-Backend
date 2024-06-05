@@ -181,11 +181,12 @@ export class InvitationController {
   async createInvitation(@Body() createInvitationDto:CreateInvitationDto,@Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
+    const userId = req.UserId;
     return {
       statusCode,
       message: "invitation send",
       data:{
-        invitation: await this.invitationService.createInvitation(tenantId, createInvitationDto)
+        invitation: await this.invitationService.createInvitation(tenantId,userId, createInvitationDto)
       }
     }
   }
@@ -220,12 +221,13 @@ export class InvitationController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
   @Permission("enviar invitaciones")
-  async reseendInvitation(@Param('id',ParseIntPipe) id:number){
+  async reseendInvitation(@Param('id',ParseIntPipe) id:number, @Req() req:Request){
     const statusCode = HttpStatus.OK;
+    const userId = req.UserId;
     return {
       statusCode,
       message: "reseend invitation",
-      data: await this.invitationService.resendInvitation(id)
+      data: await this.invitationService.resendInvitation(id,userId)
     }
   }
 
@@ -233,12 +235,13 @@ export class InvitationController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
   @Permission("cancelar invitacion")
-  async cancelInvitation(@Param('id',ParseIntPipe) id:number){
+  async cancelInvitation(@Param('id',ParseIntPipe) id:number, @Req() req:Request){
     const statusCode = HttpStatus.OK;
+    const userId = req.UserId;
     return {
       statusCode,
       message: "cancel invitation",
-      data: await this.invitationService.cancelInvitation(id)
+      data: await this.invitationService.cancelInvitation(id,userId)
     }
   }
 }

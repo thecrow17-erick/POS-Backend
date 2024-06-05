@@ -84,7 +84,8 @@ export class ProductController {
   async createProduct(@Body() body: ProductCreateDto,@Req() req: Request) {
     const statusCode = HttpStatus.CREATED
     const tenantId = req.tenantId;
-    const product = await this.productService.createProduct(body,tenantId);
+    const userId = req.UserId;
+    const product = await this.productService.createProduct(body,userId,tenantId);
     return {
       statusCode,
       message: "product created",
@@ -169,11 +170,10 @@ export class ProductController {
     storage: MemoryStoredFile
   })
   @HttpCode(HttpStatus.ACCEPTED)
-  async updateProduct(@Body() body: UpdateProductDto,@Param('id',ParseIntPipe)id: number) {
+  async updateProduct(@Body() body: UpdateProductDto,@Param('id',ParseIntPipe)id: number,@Req() req: Request) {
     const statusCode = HttpStatus.CREATED
-    console.log(body);
-    
-    const product = await this.productService.updateProduct(body,id);
+    const userId = req.UserId;
+    const product = await this.productService.updateProduct(body,userId,id);
     return {
       statusCode,
       message: `id ${id} product update`,
@@ -186,9 +186,10 @@ export class ProductController {
   @Delete(':id')
   @Permission("ver producto","eliminar producto")
   @HttpCode(HttpStatus.ACCEPTED)
-  async deleteProduct(@Param('id',ParseIntPipe)id: number){
+  async deleteProduct(@Param('id',ParseIntPipe)id: number,@Req() req: Request){
     const statusCode = HttpStatus.ACCEPTED;
-    const product = await this.productService.deleteProduct(id);
+    const userId = req.UserId;
+    const product = await this.productService.deleteProduct(id,userId);
     return{
       statusCode,
       message: `product  with id ${id} delete`,

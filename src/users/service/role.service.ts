@@ -2,11 +2,13 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { PrismaService } from 'src/prisma';
 import { IOptionPermission, IOptionRoleTenant } from '../interface';
 import { CreateRolDto } from '../dto';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class RoleService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly logService:LogService
   ){}
 
   async allTenantRoles({
@@ -103,7 +105,7 @@ export class RoleService {
     }
   }
 
-  async createRol(tenantId:number, createRolDto: CreateRolDto){
+  async createRol(tenantId:number,userId:string, createRolDto: CreateRolDto){
     try {
       const findRole = await this.findRole({
         where:{
@@ -136,7 +138,15 @@ export class RoleService {
           permissionid: p.id
         }))
       })
-
+      this.logService.log({
+        accion: `el usuario ${userId} creo el rol ${rolCreate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `Crear rol`,
+        username: userId
+      })
       return{
         rolCreate,
         permission: `${permissionRole.count} permissions assigned to the role`
@@ -151,7 +161,7 @@ export class RoleService {
     }
   }
 
-  async deleteRol(id: number, tenantId:number){
+  async deleteRol(id: number, userId:string,tenantId:number){
     try {
       const roleId = await this.findRoleId(id,tenantId);
       
@@ -164,6 +174,15 @@ export class RoleService {
         }
       }) 
 
+      this.logService.log({
+        accion: `el usuario ${userId} ${roleDelete.status? "activo":"desactivo"} el rol ${roleDelete.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `${roleDelete.status? "Activar":"Desactivar"} rol`,
+        username: userId
+      })
       return roleDelete;
       
     } catch (err) {

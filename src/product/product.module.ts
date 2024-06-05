@@ -5,6 +5,7 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
 import { AzureConnectionModule } from 'src/azure-connection/azure-connection.module';
 import { PrismaModule } from 'src/prisma';
 import { UsersModule } from 'src/users/users.module';
+import { LogModule } from 'src/log/log.module';
 
 @Module({
   controllers: [ProductController],
@@ -13,7 +14,8 @@ import { UsersModule } from 'src/users/users.module';
     NestjsFormDataModule,
     AzureConnectionModule,
     PrismaModule,
-    UsersModule
+    UsersModule,
+    LogModule
   ]
 })
 export class ProductModule {}

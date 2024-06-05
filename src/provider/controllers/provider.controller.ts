@@ -59,7 +59,8 @@ export class ProviderController {
   async createProvider(@Body() body: ProviderCreateDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
-    const provider = await this.providerService.createProvider(body,tenantId);
+    const userId= req.UserId
+    const provider = await this.providerService.createProvider(body,userId,tenantId);
     return {
       statusCode,
       message : "Provider created",
@@ -115,9 +116,10 @@ export class ProviderController {
   @Patch(':id')
   @Permission("ver proveedor","editar proveedor")
   @HttpCode(HttpStatus.ACCEPTED)
-  async updateProvider(@Body() body:ProviderUpdateDto, @Param('id',ParseUUIDPipe)id: string){
+  async updateProvider(@Body() body:ProviderUpdateDto, @Param('id',ParseUUIDPipe)id: string, @Req() req: Request){
     const statusCode = HttpStatus.ACCEPTED
-    const provider = await this.providerService.updateProvider(body,id);
+    const userId= req.UserId
+    const provider = await this.providerService.updateProvider(body,userId,id);
 
     return {
       statusCode,
@@ -131,9 +133,10 @@ export class ProviderController {
   @Delete(':id')
   @Permission("ver proveedor","eliminar proveedor")
   @HttpCode(HttpStatus.ACCEPTED)
-  async deleteProvider( @Param('id',ParseUUIDPipe)id: string){
+  async deleteProvider( @Param('id',ParseUUIDPipe)id: string, @Req() req: Request){
     const statusCode = HttpStatus.ACCEPTED
-    const provider = await this.providerService.deleteProvider(id);
+    const userId= req.UserId
+    const provider = await this.providerService.deleteProvider(id,userId);
 
     return {
       statusCode,

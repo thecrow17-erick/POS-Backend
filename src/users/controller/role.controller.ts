@@ -103,10 +103,11 @@ export class RoleController {
   async createRol(@Body() createRolDto:CreateRolDto,@Req() req:Request){
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
+    const userId = req.UserId;
     return {
       statusCode,
       message: "rol create",
-      data: await this.roleService.createRol(tenantId, createRolDto)
+      data: await this.roleService.createRol(tenantId,userId, createRolDto)
     }
   }
 
@@ -116,13 +117,15 @@ export class RoleController {
   async deleteRol(@Param("id",ParseIntPipe) id:number,@Req() req:Request){
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;
+    const userId = req.UserId;
     return{
       statusCode,
       message: "delete rol",
       data:{
-        role: await this.roleService.deleteRol(id, tenantId)
+        role: await this.roleService.deleteRol(id,userId, tenantId)
       }
     }
   }
 
 }
+ 
