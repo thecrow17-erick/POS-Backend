@@ -111,24 +111,30 @@ export class InvitationService {
       schedule.scheduleJob(afternow , async()=>{
         const findInvitation = await this.prisma.invitationTenant.findMany({
           where:{
-            userId:{
-              in: createInvitationDto.users
-            }
+            AND:[
+              {
+                userId:{
+                  in: createInvitationDto.users
+                }
+              },
+              {
+                state: "ESPERA"
+              }
+            ]
           }
         });
-        findInvitation.forEach(async(user) => {
-
-          if(user.state === "ESPERA"){
-            await this.prisma.invitationTenant.update({
-              where:{
-                id: user.id,
-              },
-              data: {
-                state: "VENCIDO"
+        if(!findInvitation.length){
+          await this.prisma.invitationTenant.updateMany({
+            where:{
+              id: {
+                in:findInvitation.map( inv => inv.id)
               }
-            })
-          }
-        })
+            },
+            data:{
+              state: "VENCIDO"
+            }
+          })
+        }
       })
       this.logService.log({
         accion: `el usuario ${userId} invito a ${usersCreate.count} personas con id ${findUsers.map(u => u.id)}`,
