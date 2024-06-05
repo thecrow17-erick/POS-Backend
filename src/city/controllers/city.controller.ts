@@ -17,7 +17,8 @@ export class CityController {
   async create(@Body() createCityDto: CreateCityDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
-    const city = await this.cityService.create(createCityDto,tenantId);
+    const userId = req.UserId;
+    const city = await this.cityService.create(createCityDto,userId,tenantId);
     return {
       statusCode,
       message: "city created",
@@ -86,9 +87,10 @@ export class CityController {
   @Patch(':id')
   @Permission("ver ciudad","editar ciudad")
   @HttpCode(HttpStatus.ACCEPTED)
-  async update(@Param('id',ParseIntPipe) id: number, @Body() updateCityDto: UpdateCityDto) {
+  async update(@Param('id',ParseIntPipe) id: number, @Body() updateCityDto: UpdateCityDto,@Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const city = await this.cityService.update(id, updateCityDto);
+    const userId = req.UserId;
+    const city = await this.cityService.update(id,userId, updateCityDto);
     return{
       statusCode,
       message: "city updated",
@@ -101,9 +103,10 @@ export class CityController {
   @Delete(':id')
   @Permission("ver ciudad","eliminar ciudad")
   @HttpCode(HttpStatus.ACCEPTED)
-  async remove(@Param('id',ParseIntPipe) id: number) {
+  async remove(@Param('id',ParseIntPipe) id: number,@Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const city = await this.cityService.remove(id);
+    const userId = req.UserId;
+    const city = await this.cityService.remove(id,userId);
     return {
       statusCode,
       message: "city updated",

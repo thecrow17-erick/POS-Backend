@@ -2,12 +2,14 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { PrismaService } from 'src/prisma';
 import { IOptionCategories } from '../interface';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class CategoryService {
 
   constructor(
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService
   ){}
   
   async allCategories({
@@ -46,7 +48,7 @@ export class CategoryService {
     }
   }
 
-  async createCategory(createCategoryDto: CreateCategoryDto,tenantId: number){
+  async createCategory(createCategoryDto: CreateCategoryDto,userId: string,tenantId: number){
     try {
       const findCategory = await this.prisma.category.findFirst({
         where:{
@@ -62,7 +64,15 @@ export class CategoryService {
           tenantId
         }
       })
-
+      this.logService.log({
+        accion: `el usuario ${userId} creo la categoria ${categoryCreate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.10.2.1",
+        message: "crear categoria",
+        username: userId
+      })
       return categoryCreate;
 
     } catch (err) {
@@ -102,7 +112,7 @@ export class CategoryService {
     }
   }
 
-  async updateCategory(id:number,updateCategoryDto: UpdateCategoryDto){
+  async updateCategory(id:number,userId: string,updateCategoryDto: UpdateCategoryDto){
     try {
       const findCategory = await this.findCategory({
         where: updateCategoryDto
@@ -116,7 +126,15 @@ export class CategoryService {
         },
         data: updateCategoryDto
       })
-
+      this.logService.log({
+        accion: `el usuario ${userId} actualizo la categoria ${updateCategory.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: updateCategory.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.10.2.1",
+        message: "crear categoria",
+        username: userId
+      })
       return updateCategory;
 
     } catch (err) {
@@ -126,7 +144,7 @@ export class CategoryService {
     }
   }
 
-  async deleteCategory(id:number){
+  async deleteCategory(id:number,userId: string){
     try {
       const findCategory =await this.findCategoryId(id);
 
@@ -138,7 +156,15 @@ export class CategoryService {
           status: !findCategory.status 
         }
       })
-
+      this.logService.log({
+        accion: `el usuario ${userId} ${deleteCategory.status? "activo": "desactivo"} la categoria ${deleteCategory.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: deleteCategory.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.10.2.1",
+        message: `${deleteCategory.status? "Activo": "Desactivo"} la categoria`,
+        username: userId
+      })
       return deleteCategory;
     } catch (err) {
       if(err instanceof NotFoundException)

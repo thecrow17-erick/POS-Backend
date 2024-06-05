@@ -3,6 +3,7 @@ import { CreateAtmDto,UpdateAtmDto } from '../dto';
 import { IOptionAtm } from '../interface';
 import { PrismaService } from 'src/prisma';
 import { BranchService } from 'src/branch/services';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class AtmService {
@@ -10,9 +11,10 @@ export class AtmService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly branchService: BranchService,
+    private readonly logService: LogService
   ){}
 
-  async create(createAtmDto: CreateAtmDto, tenantId: number) {
+  async create(createAtmDto: CreateAtmDto, userId: string,tenantId: number) {
     try {
       //pregunto si existe el id del branch
       await this.branchService.findOne(createAtmDto.branchId,{});
@@ -22,6 +24,15 @@ export class AtmService {
           ...createAtmDto,
           tenantId
         }
+      })
+      this.logService.log({
+        accion: `el usuario ${userId} creo una caja ${atmCreated.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario:userId,
+        ipAddress: "172.10.2.1",
+        message: "creacion de caja",
+        username: userId
       })
 
       return atmCreated;
@@ -108,7 +119,7 @@ export class AtmService {
     }
   }
 
-  async update(id: number, updateAtmDto: UpdateAtmDto) {
+  async update(id: number,userId: string, updateAtmDto: UpdateAtmDto) {
     try {
       //pregunto si el id del atm existe
       await this.findOne(id,{});
@@ -119,6 +130,16 @@ export class AtmService {
         },
         data: updateAtmDto
       })
+
+      this.logService.log({
+        accion: `el usuario ${userId} actualizo una caja ${atmUpdate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: atmUpdate.tenantId.toString(),
+        idUsuario:userId,
+        ipAddress: "172.10.2.1",
+        message: "actualizacion de caja",
+        username: userId
+      })
       return atmUpdate;
     } catch (err) {
       if(err instanceof NotFoundException)  throw err;
@@ -126,7 +147,7 @@ export class AtmService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number,userId: string) {
     try {
       await this.findOne(id,{});
       //ahora si actualizo
@@ -138,6 +159,16 @@ export class AtmService {
           status: false
         }
       });
+
+      this.logService.log({
+        accion: `el usuario ${userId} ${branchUpdate.status ? "activo":"desactivo"} una caja ${branchUpdate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: branchUpdate.tenantId.toString(),
+        idUsuario:userId,
+        ipAddress: "172.10.2.1",
+        message: "actualizacion de caja",
+        username: userId
+      })
       return branchUpdate;
 
     } catch (err) {

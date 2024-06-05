@@ -4,6 +4,7 @@ import { BranchModule } from 'src/branch/branch.module';
 import { ControlController, AtmController } from './controller';
 import { ControlService,AtmService } from './services';
 import { UsersModule } from 'src/users/users.module';
+import { LogModule } from 'src/log/log.module';
 
 @Module({
   controllers: [AtmController, ControlController],
@@ -11,7 +12,8 @@ import { UsersModule } from 'src/users/users.module';
   imports: [
     PrismaModule,
     BranchModule,
-    UsersModule
+    UsersModule,
+    LogModule
   ]
 })
 export class AtmModule {}

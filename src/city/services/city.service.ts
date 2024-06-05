@@ -2,15 +2,17 @@ import { BadRequestException, Injectable, InternalServerErrorException, NotFound
 import { CreateCityDto,UpdateCityDto } from '../dto';
 import { PrismaService } from 'src/prisma';
 import { IOptionCitys } from '../interface';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class CityService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly logService: LogService,
   ){}
 
-  async create(createCityDto: CreateCityDto,tenantId: number) {
+  async create(createCityDto: CreateCityDto,userId: string,tenantId: number) {
     try {
       const cityExist = await this.findCity({
         where:{
@@ -25,7 +27,15 @@ export class CityService {
           tenantId
         }
       })
-
+      this.logService.log({
+        accion: `el usuario ${userId} creo la ciudad ${cityCreate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: "crear ciudad",
+        username: userId
+      })
       return cityCreate;
     } catch (err) {
       if(err instanceof BadRequestException) throw err;
@@ -106,7 +116,7 @@ export class CityService {
     }
   }
 
-  async update(id: number, updateCityDto: UpdateCityDto) {
+  async update(id: number,userId:string, updateCityDto: UpdateCityDto) {
     try {
       const cityfind = await this.findOne(id,{});
       if(!cityfind) throw new NotFoundException("Id not found")
@@ -117,7 +127,15 @@ export class CityService {
         },
         data: updateCityDto
       })
-      
+      this.logService.log({
+        accion: `el usuario ${userId} actualizo la ciudad ${cityUpdate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: cityUpdate.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: "Actualizar ciudad",
+        username: userId
+      })
       return cityUpdate;
 
     } catch (err) {
@@ -127,7 +145,7 @@ export class CityService {
     
   }
 
-  async remove(id: number) {
+  async remove(id: number,userId:string) {
     try {
       const cityfind = await this.findOne(id,{});
       if(!cityfind) throw new NotFoundException("Id not found")
@@ -137,10 +155,19 @@ export class CityService {
           id
         },
         data: {
-          status: false
+          status: !cityfind.status
         }
       })
-      
+      this.logService.log({
+        accion: `el usuario ${userId} ${cityUpdate.status? "activo": "desactivo"} la ciudad ${cityUpdate.id}`,
+        fechaHora: new Date().toLocaleString(),
+        idTenant: cityUpdate.tenantId.toString(),
+        idUsuario: userId,
+        ipAddress: "170.20.1.2",
+        message: `${cityUpdate.status? "Activar": "Desactivar"} ciudad`,
+        username: userId
+      })
+
       return cityUpdate;
 
     } catch (err) {

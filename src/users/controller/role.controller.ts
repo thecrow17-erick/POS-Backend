@@ -35,10 +35,12 @@ export class RoleController {
       }),
       this.roleService.allTenantRoles({
         where:{
+          tenantId,
           desc:{
-            not: roleAdmin
-          },
-          tenantId
+            not: roleAdmin,
+            contains:search,
+            mode: "insensitive"
+          }
         },
         skip,
         take: limit

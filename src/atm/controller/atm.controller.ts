@@ -17,7 +17,8 @@ export class AtmController {
   async create(@Body() createAtmDto: CreateAtmDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
     const tenantId = req.tenantId;
-    const atm = await this.atmService.create(createAtmDto,tenantId);
+    const userId = req.UserId;
+    const atm = await this.atmService.create(createAtmDto,userId,tenantId);
     return {
       statusCode,
       message: "atm created",
@@ -133,9 +134,10 @@ export class AtmController {
   @Patch(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @Permission("ver cajero","editar cajero")
-  async update(@Param('id',ParseIntPipe) id: number, @Body() updateAtmDto: UpdateAtmDto) {
+  async update(@Param('id',ParseIntPipe) id: number, @Body() updateAtmDto: UpdateAtmDto, @Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const atm = await this.atmService.update(id,updateAtmDto);
+    const userId = req.UserId;
+    const atm = await this.atmService.update(id,userId,updateAtmDto);
     return {
       statusCode,
       message: "atm updated",
@@ -148,9 +150,10 @@ export class AtmController {
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @Permission("ver cajero","eliminar cajero")
-  async remove(@Param('id',ParseIntPipe) id: number) {
+  async remove(@Param('id',ParseIntPipe) id: number, @Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const atm = await this.atmService.remove(id);
+    const userId = req.UserId;
+    const atm = await this.atmService.remove(id,userId);
     return {
       statusCode,
       message: "atm delete",

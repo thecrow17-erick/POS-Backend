@@ -52,7 +52,8 @@ export class CategoryController {
   async createCategory(@Body() body: CreateCategoryDto,@Req() req: Request){
     const tenantId = req.tenantId;
     const statusCode = HttpStatus.OK
-    const category = await this.categoryService.createCategory(body,tenantId);
+    const userId = req.UserId;
+    const category = await this.categoryService.createCategory(body,userId,tenantId);
 
     return {
       statusCode,
@@ -81,9 +82,10 @@ export class CategoryController {
   @Patch(":id")
   @HttpCode(HttpStatus.ACCEPTED)
   @Permission("editar categoria","ver categoria")
-  async updateCategory(@Param('id', ParseIntPipe) id:number,@Body() body:UpdateCategoryDto){
+  async updateCategory(@Param('id', ParseIntPipe) id:number,@Body() body:UpdateCategoryDto,@Req() req: Request){
     const statusCode = HttpStatus.ACCEPTED;
-    const category = await this.categoryService.updateCategory(id,body)
+    const userId = req.UserId;
+    const category = await this.categoryService.updateCategory(id,userId,body)
 
     return {
       statusCode,
@@ -97,9 +99,10 @@ export class CategoryController {
   @Delete(":id")
   @Permission("ver categoria","eliminar categoria")
   @HttpCode(HttpStatus.ACCEPTED)
-  async deleteCategory(@Param('id', ParseIntPipe) id:number){
+  async deleteCategory(@Param('id', ParseIntPipe) id:number,@Req() req: Request){
     const statusCode = HttpStatus.ACCEPTED;
-    const category = await this.categoryService.deleteCategory(id)
+    const userId = req.UserId;
+    const category = await this.categoryService.deleteCategory(id,userId)
     return {
       statusCode,
       message: "update category",

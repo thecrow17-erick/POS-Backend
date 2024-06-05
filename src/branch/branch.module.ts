@@ -4,6 +4,7 @@ import { BranchController } from './controllers';
 import { PrismaModule } from 'src/prisma';
 import { CityModule } from 'src/city/city.module';
 import { UsersModule } from 'src/users/users.module';
+import { LogModule } from 'src/log/log.module';
 
 @Module({
   controllers: [BranchController],
@@ -11,7 +12,8 @@ import { UsersModule } from 'src/users/users.module';
   imports: [
     PrismaModule,
     CityModule,
-    UsersModule
+    UsersModule,
+    LogModule
   ],
   exports: [
     BranchService

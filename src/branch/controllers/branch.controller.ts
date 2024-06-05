@@ -17,7 +17,8 @@ export class BranchController {
   async create(@Body() createBranchDto: CreateBranchDto, @Req() req: Request) {
     const tenantId = req.tenantId;
     const statusCode = HttpStatus.CREATED;
-    const branch = await this.branchService.create(createBranchDto,tenantId);
+    const userId = req.UserId;
+    const branch = await this.branchService.create(createBranchDto,userId,tenantId);
     return {
       statusCode,
       message: "Branch created",
@@ -120,9 +121,10 @@ export class BranchController {
   @Patch(':id')
   @Permission("ver sucursal", "editar sucursal")
   @HttpCode(HttpStatus.ACCEPTED)
-  async update(@Param('id',ParseIntPipe) id: number, @Body() updateBranchDto: UpdateBranchDto) {
+  async update(@Param('id',ParseIntPipe) id: number, @Body() updateBranchDto: UpdateBranchDto, @Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const branch = await this.branchService.update(id,updateBranchDto);
+    const userId = req.UserId;
+    const branch = await this.branchService.update(id,userId,updateBranchDto);
     return {
       statusCode,
       message: "Branch updated",
@@ -135,9 +137,10 @@ export class BranchController {
   @Delete(':id')
   @Permission("ver sucursal", "eliminar sucursal")
   @HttpCode(HttpStatus.ACCEPTED)
-  async remove(@Param('id',ParseIntPipe) id: number) {
+  async remove(@Param('id',ParseIntPipe) id: number, @Req() req: Request) {
     const statusCode = HttpStatus.ACCEPTED;
-    const branch = await this.branchService.remove(id);
+    const userId = req.UserId;
+    const branch = await this.branchService.remove(id,userId);
     return {
       statusCode,
       message: "Branch updated",

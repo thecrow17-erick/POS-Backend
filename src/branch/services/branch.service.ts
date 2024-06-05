@@ -3,16 +3,18 @@ import { CreateBranchDto,UpdateBranchDto } from '../dto';
 import { PrismaService } from 'src/prisma';
 import { IOptionBranch } from '../interface';
 import { CityService } from 'src/city/services';
+import { LogService } from 'src/log/service/log.service';
 
 @Injectable()
 export class BranchService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cityService: CityService
+    private readonly cityService: CityService,
+    private readonly logService: LogService
   ){}
 
-  async create(createBranchDto: CreateBranchDto,tenantId: number) {
+  async create(createBranchDto: CreateBranchDto,userId: string,tenantId: number) {
     try {
       await this.cityService.findOne(createBranchDto.cityId,{});
       //si existe seguimos pregutnando por los otros datos
@@ -35,7 +37,15 @@ export class BranchService {
           tenantId
         }
       })
-      
+      this.logService.log({
+        idUsuario: userId,
+        fechaHora: new Date().toLocaleString(),
+        accion: `el usuario ${userId} creo una sucursal ${branchCreate.id}`,
+        idTenant: tenantId.toString(),
+        message: "crear una sucursal",
+        ipAddress: "170.10.2.1",
+        username: userId
+      });
       return branchCreate;
 
     } catch (err) {
@@ -106,7 +116,7 @@ export class BranchService {
     }
   }
 
-  async update(id: number, updateBranchDto: UpdateBranchDto) {
+  async update(id: number, userId:string,updateBranchDto: UpdateBranchDto) {
     try {
       await this.findOne(id,{});
 
@@ -131,6 +141,15 @@ export class BranchService {
         data: updateBranchDto
       });
 
+      this.logService.log({
+        idUsuario: userId,
+        fechaHora: new Date().toLocaleString(),
+        accion: `el usuario ${userId} actualizo una sucursal ${branchUpdate.id}`,
+        idTenant: branchUpdate.tenantId.toString(),
+        message: "actualiza una sucursal",
+        ipAddress: "170.10.2.1",
+        username: userId
+      });
       return branchUpdate;
 
     } catch (err) {
@@ -155,7 +174,7 @@ export class BranchService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId:string) {
     try {
       await this.findOne(id,{});
       //ahora si actualizo
@@ -166,6 +185,16 @@ export class BranchService {
         data: {
           status: false
         }
+      });
+
+      this.logService.log({
+        idUsuario: userId,
+        fechaHora: new Date().toLocaleString(),
+        accion: `el usuario ${userId} ${branchUpdate.status ? "activo":"desactivo"} una sucursal ${branchUpdate.id}`,
+        idTenant: branchUpdate.tenantId.toString(),
+        message: "actualiza una sucursal",
+        ipAddress: "170.10.2.1",
+        username: userId
       });
       return branchUpdate;
 

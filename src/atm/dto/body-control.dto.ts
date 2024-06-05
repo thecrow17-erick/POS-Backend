@@ -4,8 +4,6 @@ export class BodyControlDto{
   @IsDecimal()
   monto:          string;
 
-  @IsString()
-  employeeCode:     string;
 
   @IsNumber()
   @IsInt()
