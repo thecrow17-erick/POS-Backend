@@ -23,4 +23,5 @@ export const EnvSchema = Joi.object({
   BACKUP_MIN:Joi.number().default(0),
   BACKUP_MONTH:Joi.number().default(3),
   FRONTEND_URL: Joi.string().required(),
+  SETUP_INSIGN_AZURE: Joi.string().required()
 })

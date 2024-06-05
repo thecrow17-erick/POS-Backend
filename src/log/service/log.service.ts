@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import * as appInsights from 'applicationinsights';
 import { log_Interface } from '../interface/log-create-dto';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class LogService {
   private client: appInsights.TelemetryClient;
-  private appId: string;
-  private apiKey: string;
-  constructor() {
+  constructor(
+    private readonly configService:ConfigService
+  ) {
     appInsights
       .setup(
-        'InstrumentationKey=a4b935f8-b2d1-4649-a8cc-d87cc29615dc;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=39c073a4-c6b6-49bb-aa3d-60ce5bcbeb46',
+        this.configService.get<string>("setup_insign"),
       )
       .setAutoDependencyCorrelation(true)
       .setAutoCollectRequests(true)
