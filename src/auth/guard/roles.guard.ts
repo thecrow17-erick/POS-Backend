@@ -18,7 +18,6 @@ export class RolesGuard implements CanActivate {
     if (!permissions) {
         return true;
     }
-    console.log(permissions)
     const req = context.switchToHttp().getRequest<Request>();
     const userId = req.UserId;
     const tenantId = req.tenantId;
@@ -38,10 +37,9 @@ export class RolesGuard implements CanActivate {
         ]
       },
     })
-
     if(!findRolMember)
       throw new UnauthorizedException("the user does not belong to the tenant")
-
+    
     const findPermission = await this.prisma.rolePermission.findMany({
       where:{
         rolId: findRolMember.id,
@@ -59,7 +57,6 @@ export class RolesGuard implements CanActivate {
     if(findPermission.length == permissions.length)
       return true;
 
-
-    throw new UnauthorizedException("Role is not valid")
+    throw new UnauthorizedException("El rol no tiene este permiso")
   } 
 }
