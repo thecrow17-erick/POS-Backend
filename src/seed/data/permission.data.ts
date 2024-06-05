@@ -15,7 +15,7 @@ export const permissionData: IPermissions[] = [
     desc: "edit category"
   },
   {
-    desc: "view user-role"
+    desc: "ver empleado"
   },
   {
     desc: "ver roles"

@@ -53,21 +53,7 @@ export class UserRoleService {
 
   async updateUserRole(tenantId:number,memberId:number,asignInvitationDto:AsignInvitationDto){
     try {
-      const findMember = await this.prisma.memberTenant.findFirst({
-        where:{
-          AND: [
-            {
-              tenantId
-            },
-            {
-              id: memberId
-            }
-          ]
-        }
-      })
-      if(!findMember)
-        throw new BadRequestException("miembro no encontrado")
-
+      const findMember = await this.findByIdMember(tenantId,memberId);
       const role = await this.roleService.findRoleId(asignInvitationDto.rolId, tenantId);
       const updateMemberRol = await this.prisma.memberTenant.update({
         where: {
@@ -91,4 +77,40 @@ export class UserRoleService {
     }
   }
   
+  async findByIdMember(tenantId:number,memberId:number){
+    try {
+      const findMember = await this.prisma.memberTenant.findFirst({
+        where:{
+          AND: [
+            {
+              tenantId
+            },
+            {
+              id: memberId
+            }
+          ]
+        },
+        select:{
+          rol: true,
+          tenant: true,
+          id: true,
+          user: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
+      if(!findMember)
+        throw new NotFoundException("miembro no encontrado")
+      
+      return findMember;
+
+    } catch (err) {
+      if(err instanceof NotFoundException)
+        throw err;
+
+      throw new InternalServerErrorException(`server error ${err}`)
+    }
+
+  }
+
 }

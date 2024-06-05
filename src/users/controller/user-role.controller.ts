@@ -15,7 +15,7 @@ export class UserRoleController {
   ){} 
   
   @Get()
-  @Permission("view user-role")
+  @Permission("ver empleado")
   @HttpCode(HttpStatus.OK)
   async allUserRole(@Query() query: QueryCommonDto, @Req() req:Request){
     const statusCode = HttpStatus.OK;
@@ -90,6 +90,30 @@ export class UserRoleController {
       message: "member update role",
       data: {
         user: await this.userRoleService.updateUserRole(tenantId,id,asignInvitationDto)
+      }
+    }
+  }
+
+  @Get(":id")
+  @Permission("ver empleado")
+  @HttpCode(HttpStatus.OK)
+  async findByIdEmployee(@Param('id',ParseIntPipe) id:number , @Req() req:Request){
+    const statusCode = HttpStatus.OK;
+    const tenantId = req.tenantId;
+    const userId = req.UserId;
+    const user = await this.userRoleService.findByIdMember(tenantId,id)
+
+    const employee = {
+      ...user,
+      createdAt: user.createdAt.toLocaleString(),
+      updatedAt: user.updatedAt.toLocaleString()
+    }
+
+    return {
+      statusCode,
+      message: "view employee",
+      data: {
+        employee
       }
     }
   }
