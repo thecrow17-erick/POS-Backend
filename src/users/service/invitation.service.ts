@@ -8,12 +8,17 @@ import * as schedule from 'node-schedule';
 import { addDays } from 'date-fns';
 import {v4 as uuid} from 'uuid'
 import * as bcrypt from 'bcrypt';
+import { UsersService } from './users.service';
+import { RoleService } from './role.service';
+
 @Injectable()
 export class InvitationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailsService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly userService: UsersService,
+    private readonly roleService: RoleService
   ){}
 
   async allInvitation({
@@ -52,95 +57,95 @@ export class InvitationService {
 
   async createInvitation(tenantId:number, createInvitationDto:CreateInvitationDto){
     try {
-      const userFind = await this.prisma.user.findUnique({
-        where:{
-          id: createInvitationDto.userId
-        }
-      });
-      if(!userFind)
-        throw new NotFoundException("invite a valid user")
-      
       const tenant = await this.prisma.tenant.findUnique({
         where:{
           id: tenantId
         }
       })
 
-      const rolFind = await this.prisma.rol.findUnique({
-        where:{
-          id: createInvitationDto.rolId
-        }
-      })
-      if(!rolFind)
-        throw new NotFoundException("insert a valid role")
-
-      const findInvitation = await this.prisma.invitationTenant.findFirst({
-        where:{
-          tenantId,
-          userId: userFind.id,
-        }
-      })
-      if(findInvitation){
-        if(findInvitation.state === "ESPERA")
-          throw new BadRequestException("The user already has an invitation")
-
-        if(findInvitation.state === "ACEPTADO")
-          throw new BadRequestException("The user has already accepted the invitation")
-
-        if(findInvitation.state === "VENCIDO" || findInvitation.state === "CANCELADO")
-          throw new BadRequestException("reesend invitation")
-
-      }
-
-      const response = await this.prisma.$transaction(async(tx) =>{
-        const invitationCreate =await tx.invitationTenant.create({
-          data:{
-            tenantId,
-            rolId: rolFind.id,
-            userId: userFind.id,
-            state: "ESPERA"
+      const findUsers = await this.userService.findAllUser({
+        where: {
+          id: {
+            in: createInvitationDto.users
           }
-        });
+        }
+      })
+      if(findUsers.length !== createInvitationDto.users.length)
+        throw new BadRequestException("Algun usuario no coincide, intente nuevamente.")
+  
+      const roleId = await this.roleService.findRoleId(createInvitationDto.rolId,tenantId);
+
+      const usersCreate = await this.prisma.invitationTenant.createMany({
+        data: findUsers.map(user => ({
+          userId: user.id,
+          rolId:roleId.id,
+          tenantId,
+          state: "ESPERA"
+        }))
+      })
+      findUsers.map(async(user) => {
+        const invitation = await this.prisma.invitationTenant.findFirst({
+          where:{
+            AND: [
+              {
+                tenantId:tenant.id,
+              },
+              {
+                userId: user.id
+              }
+            ]
+          }
+        })
 
         await this.mailService.sendInvitacion(
-          userFind.name,
-          userFind.email,
+          user.name,
+          user.email,
           tenant.hosting,
-          `${this.configService.get<string>("frontend_url")}/invitation/${invitationCreate.id}`
-        )
-        return invitationCreate;
+          `${this.configService.get<string>("frontend_url")}/invitation/${invitation.id}`
+        );
       })
+
       const afternow = addDays(new Date(),1);
-      schedule.scheduleJob(afternow, async()=>{
-        console.log("test invitation")
-        const invitationFind = await this.prisma.invitationTenant.findUnique({
+      schedule.scheduleJob(afternow , async()=>{
+        const findInvitation = await this.prisma.invitationTenant.findMany({
           where:{
-            id: response.id
+            AND:[
+              {
+                userId:{
+                  in: createInvitationDto.users
+                }
+              },
+              {
+                state: "ESPERA"
+              }
+            ]
           }
-        });
-        if(invitationFind.state === "ESPERA"){
-          await this.prisma.invitationTenant.update({
+        })
+        if(findInvitation.length){
+          await this.prisma.invitationTenant.updateMany({
             where:{
-              id: response.id
+              id: {
+                in: findInvitation.map(i => i.id)
+              },
             },
-            data:{
-              state:"VENCIDO"
+            data: {
+              state: "VENCIDO"
             }
           })
         }
       })
 
-      return response;
-
+      return {
+        invitation: `${usersCreate.count} invitaciones enviadas correctamente`
+      }
     } catch (err) {
-      if(err instanceof NotFoundException)
-        throw err;
-
       if(err instanceof BadRequestException)
         throw err;
-
-
+      
+      if(err instanceof NotFoundException)
+        throw err;
       throw new InternalServerErrorException(`server error ${err}`)
+
     }
   }
 

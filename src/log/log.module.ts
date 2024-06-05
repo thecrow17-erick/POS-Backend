@@ -6,6 +6,9 @@ import { ConfigModule } from '@nestjs/config';
   providers: [LogService],
   imports: [
     ConfigModule
+  ],
+  exports: [
+    LogService
   ]
 })
 export class LogModule {}

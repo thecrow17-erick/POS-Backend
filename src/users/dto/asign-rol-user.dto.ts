@@ -1,14 +1,10 @@
 import { IsInt, IsNumber, IsString, IsUUID } from "class-validator";
 
 
-export class CreateInvitationDto{
+export class AsignInvitationDto{
 
   @IsNumber()
   @IsInt()
   rolId: number;
-
-  @IsString()
-  @IsUUID()
-  userId: string;
 
 }

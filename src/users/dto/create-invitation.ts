@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsArray, IsInt, IsNumber, IsString, IsUUID } from "class-validator";
 
 export class CreateInvitationDto{
 
@@ -6,8 +6,9 @@ export class CreateInvitationDto{
   @IsInt()
   rolId: number;
 
-  @IsString()
-  @IsUUID()
-  userId: string;
+  @IsArray()
+  @IsString({each: true})
+  @IsUUID('4',{each: true})
+  users: string[];
 
 }

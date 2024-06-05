@@ -34,6 +34,9 @@ export const permissionData: IPermissions[] = [
   },
   {
     desc: "cancelar invitacion"
+  },
+  {
+    desc: "actualizar rol miembro"
   }
 ]
 

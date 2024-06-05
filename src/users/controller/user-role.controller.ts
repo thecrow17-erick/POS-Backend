@@ -1,9 +1,10 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { UserRoleService } from '../service/user-role.service';
 import { Permission } from 'src/auth/decorators';
 import { QueryCommonDto } from 'src/common';
 import { Request } from 'express';
+import { AsignInvitationDto } from '../dto';
 
 @Controller('user-role')
 @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
@@ -40,6 +41,9 @@ export class UserRoleController {
         select:{
           id: true,
           user: true,
+          rol: true,
+          createdAt: true,
+          updatedAt: true,
         }
       }),
       this.userRoleService.countUserRole({
@@ -60,11 +64,8 @@ export class UserRoleController {
 
     const allUsers = users.map(user => ({
       ...user,
-      user: {
-        ...user.user,
-        createdAt: user.user.createdAt.toLocaleString(),
-        updatedAt: user.user.updatedAt.toLocaleString()
-      }
+      createdAt: user.createdAt.toLocaleString(),
+      updatedAt: user.updatedAt.toLocaleString()
     }));
 
     return {
@@ -77,5 +78,20 @@ export class UserRoleController {
     }
   }
 
+  @Patch(":id")
+  @Permission("actualizar rol miembro")
+  @HttpCode(HttpStatus.OK)
+  async updateRoleMember(@Param('id',ParseIntPipe) id:number ,@Body() asignInvitationDto:AsignInvitationDto, @Req() req:Request){
+    const statusCode = HttpStatus.OK;
+    const tenantId = req.tenantId;
+    const userId = req.UserId;
+    return {
+      statusCode,
+      message: "member update role",
+      data: {
+        user: await this.userRoleService.updateUserRole(tenantId,id,asignInvitationDto)
+      }
+    }
+  }
 }
 
