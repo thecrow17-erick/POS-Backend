@@ -1,16 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { FormDataRequest, MemoryStoredFile } from 'nestjs-form-data';
 import { ProductCreateDto } from '../dto/create-product.dto';
-import { TenantGuard } from 'src/auth/guard';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { Request } from 'express';
 import { ProductService } from '../services/product.service';
 import { AzureConnectionService } from 'src/azure-connection/azure-connection.service';
 import { QueryCommonDto } from 'src/common';
-import { number } from 'joi';
 import { UpdateProductDto } from '../dto';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('product')
-@UseGuards(TenantGuard)
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class ProductController {
 
   constructor(
@@ -19,6 +19,7 @@ export class ProductController {
   ){}
 
   @Get()
+  @Permission("ver producto")
   @HttpCode(HttpStatus.OK)
   async allProducts(@Query() query: QueryCommonDto,@Req() req: Request){
     const statusCode = HttpStatus.OK;
@@ -75,6 +76,7 @@ export class ProductController {
   } 
 
   @Post()
+  @Permission("crear producto")
   @FormDataRequest({
     storage: MemoryStoredFile
   })
@@ -93,6 +95,7 @@ export class ProductController {
   }
 
   @Get(':id')
+  @Permission("ver producto")
   @HttpCode(HttpStatus.ACCEPTED)
   async getProductId(@Param('id',ParseIntPipe) id: number){
     const statusCode = HttpStatus.ACCEPTED;
@@ -161,6 +164,7 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Permission("ver producto","editar producto")
   @FormDataRequest({
     storage: MemoryStoredFile
   })
@@ -180,6 +184,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Permission("ver producto","eliminar producto")
   @HttpCode(HttpStatus.ACCEPTED)
   async deleteProduct(@Param('id',ParseIntPipe)id: number){
     const statusCode = HttpStatus.ACCEPTED;

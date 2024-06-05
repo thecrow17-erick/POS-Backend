@@ -3,6 +3,7 @@ import { PrismaModule } from 'src/prisma';
 import { BranchModule } from 'src/branch/branch.module';
 import { ControlController, AtmController } from './controller';
 import { ControlService,AtmService } from './services';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   controllers: [AtmController, ControlController],
@@ -10,6 +11,7 @@ import { ControlService,AtmService } from './services';
   imports: [
     PrismaModule,
     BranchModule,
+    UsersModule
   ]
 })
 export class AtmModule {}

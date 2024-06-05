@@ -3,14 +3,16 @@ import { AtmService } from '../services'
 import { CreateAtmDto , UpdateAtmDto } from '../dto';
 import { ParseQueryPipe, QueryCommonDto } from 'src/common';
 import { Request } from 'express';
-import { TenantGuard } from 'src/auth/guard';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('atm')
-@UseGuards(TenantGuard)
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class AtmController {
   constructor(private readonly atmService: AtmService) {}
 
   @Post()
+  @Permission("crear cajero")
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createAtmDto: CreateAtmDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
@@ -27,15 +29,20 @@ export class AtmController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Permission("ver cajero")
   async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto, @Req() req: Request) {
     const statusCode = HttpStatus.OK;
-    const {limit,skip} = query;
+    const {limit,skip,search} = query;
     const tenantId = req.tenantId;
     const [atms, total] = await Promise.all([
       this.atmService.findAll(
-        {
+        {       
           where:{
-            tenantId
+            tenantId,
+            name:{
+              contains: search,
+              mode: "insensitive"
+            }
           },
           skip,
           take:limit,
@@ -61,24 +68,35 @@ export class AtmController {
           }
       }),
       this.atmService.countAll({
-        where: {
-          tenantId
+        where:{
+          tenantId,
+          name:{
+            contains: search,
+            mode: "insensitive"
+          }
         }
       })
     ])
+
+    const allAtms = atms.map(atm => ({
+      ...atm,
+      createdAt: atm.createdAt.toLocaleString(),
+      updatedAt: atm.updatedAt.toLocaleString(),
+    }))
 
     return {
       statusCode,
       message: "All atm",
       data: {
         total,
-        atms
+        atms:allAtms
       }
     }
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Permission("ver cajero")
   async findOne(@Param('id',ParseIntPipe) id: number) {
     const statusCode = HttpStatus.OK;
     const atm = await this.atmService.findOne(id,{
@@ -114,6 +132,7 @@ export class AtmController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.ACCEPTED)
+  @Permission("ver cajero","editar cajero")
   async update(@Param('id',ParseIntPipe) id: number, @Body() updateAtmDto: UpdateAtmDto) {
     const statusCode = HttpStatus.ACCEPTED;
     const atm = await this.atmService.update(id,updateAtmDto);
@@ -128,6 +147,7 @@ export class AtmController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
+  @Permission("ver cajero","eliminar cajero")
   async remove(@Param('id',ParseIntPipe) id: number) {
     const statusCode = HttpStatus.ACCEPTED;
     const atm = await this.atmService.remove(id);

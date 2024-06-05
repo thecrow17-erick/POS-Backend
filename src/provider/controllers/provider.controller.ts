@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
-import { TenantGuard } from 'src/auth/guard';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { QueryCommonDto } from 'src/common';
 import { ProviderService } from '../services';
 import { ProviderCreateDto } from '../dto';
 import { ProviderUpdateDto } from '../dto/update-provider.dto';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('provider')
-@UseGuards(TenantGuard)
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class ProviderController {
 
   constructor(
@@ -15,6 +16,7 @@ export class ProviderController {
   ){}
 
   @Get()
+  @Permission("ver proveedor")
   @HttpCode(HttpStatus.OK)
   async findAllProviders(@Query() query: QueryCommonDto, @Req() req: Request) {
     const statusCode = HttpStatus.OK;
@@ -52,6 +54,7 @@ export class ProviderController {
 
   }
   @Post()
+  @Permission("crear proveedor")
   @HttpCode(HttpStatus.CREATED)
   async createProvider(@Body() body: ProviderCreateDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
@@ -67,6 +70,7 @@ export class ProviderController {
   }
 
   @Get(':id')
+  @Permission("ver proveedor")
   @HttpCode(HttpStatus.ACCEPTED)
   async findIdProvider(@Param('id',ParseUUIDPipe)id: string){
     const statusCode  = HttpStatus.ACCEPTED
@@ -109,6 +113,7 @@ export class ProviderController {
   }
 
   @Patch(':id')
+  @Permission("ver proveedor","editar proveedor")
   @HttpCode(HttpStatus.ACCEPTED)
   async updateProvider(@Body() body:ProviderUpdateDto, @Param('id',ParseUUIDPipe)id: string){
     const statusCode = HttpStatus.ACCEPTED
@@ -124,6 +129,7 @@ export class ProviderController {
   }
 
   @Delete(':id')
+  @Permission("ver proveedor","eliminar proveedor")
   @HttpCode(HttpStatus.ACCEPTED)
   async deleteProvider( @Param('id',ParseUUIDPipe)id: string){
     const statusCode = HttpStatus.ACCEPTED

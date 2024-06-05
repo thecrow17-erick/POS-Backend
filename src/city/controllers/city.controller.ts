@@ -1,14 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query, ParseIntPipe, Res, Req, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query, ParseIntPipe, Res, Req, HttpCode, UseGuards } from '@nestjs/common';
 import { CityService } from '../services';
 import { CreateCityDto,UpdateCityDto } from '../dto';
 import { ParseQueryPipe, QueryCommonDto } from 'src/common';
 import { Request, Response } from 'express';
+import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
+import { Permission } from 'src/auth/decorators';
 
 @Controller('city')
+@UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class CityController {
   constructor(private readonly cityService: CityService) {}
 
   @Post()
+  @Permission("crear ciudad")
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createCityDto: CreateCityDto, @Req() req: Request) {
     const statusCode = HttpStatus.CREATED;
@@ -22,22 +26,34 @@ export class CityController {
       }
     }
   }
-
+  
   @Get()
+  @Permission("ver ciudad")
   @HttpCode(HttpStatus.OK)
   async findAll(@Query(new ParseQueryPipe()) query: QueryCommonDto, @Req() req: Request) {
     const statusCode = HttpStatus.OK;
     const tenantId = req.tenantId;
-    const {limit,skip} = query;
+    const {limit,skip,search} = query;
     const [citys,total] = await Promise.all([
       this.cityService.findAll({
+        where:{
+          name: {
+            contains: search,
+            mode: "insensitive"
+          },
+          tenantId
+        },
         skip, 
         take:limit,
       }),
       await this.cityService.countAll({
         where:{
+          name: {
+            contains: search,
+            mode: "insensitive"
+          },
           tenantId
-        }
+        },
       })
     ])
     
@@ -52,6 +68,8 @@ export class CityController {
   }
 
   @Get(':id')
+  @Permission("ver ciudad")
+  @HttpCode(HttpStatus.OK)
   async findOne(@Param('id',ParseIntPipe) id: number, @Res() res: Response) {
     console.log(id);
     const statusCode = HttpStatus.ACCEPTED;
@@ -66,6 +84,7 @@ export class CityController {
   }
 
   @Patch(':id')
+  @Permission("ver ciudad","editar ciudad")
   @HttpCode(HttpStatus.ACCEPTED)
   async update(@Param('id',ParseIntPipe) id: number, @Body() updateCityDto: UpdateCityDto) {
     const statusCode = HttpStatus.ACCEPTED;
@@ -80,6 +99,7 @@ export class CityController {
   }
 
   @Delete(':id')
+  @Permission("ver ciudad","eliminar ciudad")
   @HttpCode(HttpStatus.ACCEPTED)
   async remove(@Param('id',ParseIntPipe) id: number) {
     const statusCode = HttpStatus.ACCEPTED;

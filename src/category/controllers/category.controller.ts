@@ -16,7 +16,7 @@ export class CategoryController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @Permission("view category")
+  @Permission("ver categoria")
   async allCategories(@Query() query: QueryCommonDto,@Req() req: Request){
     const tenantId = req.tenantId;
     const {limit,skip} = query;
@@ -65,7 +65,7 @@ export class CategoryController {
 
   @Get(":id")
   @HttpCode(HttpStatus.ACCEPTED)
-  @Permission("view category")
+  @Permission("ver categoria")
   async findCategory(@Param('id', ParseIntPipe) id:number){
     const statusCode = HttpStatus.ACCEPTED;
     const category = await this.categoryService.findCategoryId(id)
@@ -80,7 +80,7 @@ export class CategoryController {
   
   @Patch(":id")
   @HttpCode(HttpStatus.ACCEPTED)
-  @Permission("edit category","view category")
+  @Permission("editar categoria","ver categoria")
   async updateCategory(@Param('id', ParseIntPipe) id:number,@Body() body:UpdateCategoryDto){
     const statusCode = HttpStatus.ACCEPTED;
     const category = await this.categoryService.updateCategory(id,body)
@@ -95,7 +95,7 @@ export class CategoryController {
   }
 
   @Delete(":id")
-  @Permission("view category","delete category")
+  @Permission("ver categoria","eliminar categoria")
   @HttpCode(HttpStatus.ACCEPTED)
   async deleteCategory(@Param('id', ParseIntPipe) id:number){
     const statusCode = HttpStatus.ACCEPTED;
