@@ -6,8 +6,6 @@ import { PrismaService } from 'src/prisma';
 import { CreateUserDto } from '../dto';
 import { IOptionUser } from '../interface';
 import { MailsService } from 'src/mails/mails.service';
-import {addMinutes} from 'date-fns';
-import * as schedule from 'node-schedule';
 
 @Injectable()
 export class UsersService {
@@ -123,19 +121,5 @@ export class UsersService {
       throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
     }
   }  
-
-  async getDate(){
-    const now = new Date();
-    console.log(now);
-    const date = addMinutes(now, 1);
-    console.log(date);
-    schedule.scheduleJob(date, ()=>{
-      console.log('====================================');
-      console.log("ok cron job",date);
-      console.log('====================================');
-    })
-
-    return "ok schedule"
-  }
 
 }

@@ -14,7 +14,7 @@ export class AuthController {
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async loginSas(@Body() body : LoginUser){
-    const statusCode = HttpStatus.OK;
+    const statusCode = HttpStatus.CREATED;
 
     const data =await this.authService.loginSaaS(body);
     return {

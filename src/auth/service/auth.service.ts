@@ -8,7 +8,6 @@ import { LoginUser } from '../dto';
 import { PayloadToken, PayloadTokenTenant } from '../interface';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma';
-import { roles } from 'src/constants';
 
 @Injectable()
 export class AuthService {
@@ -74,9 +73,16 @@ export class AuthService {
           tenantId,
           userId: user.id
         },
-        select:{
-          passwordTenant: true,
-          tenant: true,
+        include:{
+          rol:{
+            include:{
+              permissions:{
+                include:{
+                  permission: true
+                }
+              }
+            }
+          }
         }
       })  
       if(!findUserTenant)
@@ -86,7 +92,7 @@ export class AuthService {
 
       if(!passwordValidate)
         throw new BadRequestException("password not validate")
-
+      
       const payload: PayloadTokenTenant = {
         userId: user.id,
       }
@@ -107,6 +113,8 @@ export class AuthService {
       throw new InternalServerErrorException(`server error ${JSON.stringify(error)}`)
     }
   }
+
+
   signJWT({
     payload,
     expires,

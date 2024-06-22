@@ -1,6 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from '../service';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { FormDataRequest } from 'nestjs-form-data';
 import { CreateUserDto } from '../dto/create-user.dto';
 
@@ -27,9 +26,9 @@ export class UsersController {
     }
   }
 
-
-  @Get("schedule")
-  async getSchedule(){
-    return this.userService.getDate();
+  @Get()
+  testApi(){
+    return "hello world";
   }
+
 } 

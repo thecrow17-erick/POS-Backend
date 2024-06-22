@@ -141,7 +141,8 @@ export class SuscriptionService {
       const dataBody = {
         hosting: body.hosting,
         suscriptionId: +body.suscriptionId,
-        userId: body.userId
+        userId: body.userId,
+        name: body.name,
       } 
       const saltOrRounds = bcrypt.genSaltSync(10)
       const suscriptionFind = await this.findSuscriptionId(dataBody.suscriptionId,{});
@@ -161,6 +162,7 @@ export class SuscriptionService {
         //crea el tenant
         const tenatCreate = await tx.tenant.create({
           data:{
+            name: dataBody.name,
             hosting: dataBody.hosting,
           }
         });

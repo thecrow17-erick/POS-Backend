@@ -21,6 +21,8 @@ model Suscription {
 model Tenant {
   id          Int                 @id @default(autoincrement())
   hosting     String
+  name        String              @db.Char(50)
+  logo        String?             @db.Text
   createdAt   DateTime            @default(now()) @db.Timestamp(6)
   updatedAt   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
   status      Boolean             @default(true)
@@ -101,11 +103,23 @@ model RolePermission{
 model Permission {
   id        Int     @id @default(autoincrement())
   desc      String  @db.VarChar(60)
-
+  module    Module
   roles     RolePermission[]
 }
 
-
+enum Module{
+  EMPLEADOS
+  CIUDADES
+  SUCURSALES
+  CAJAS
+  CATEGORIAS
+  PROVEEDORES
+  PRODUCTOS
+  ROLES
+  INVITACIONES
+  COMPRAS
+  VENTAS
+}
 
 model InvitationTenant {
   id        Int             @id @default(autoincrement())
