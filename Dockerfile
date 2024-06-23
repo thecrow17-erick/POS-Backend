@@ -35,4 +35,4 @@ RUN npm install --only=production
 
 EXPOSE ${PORT}
 
-CMD [ "node", "dist/main.js" ]
+CMD ["node","dist/main.js" ]

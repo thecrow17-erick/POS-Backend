@@ -36,7 +36,7 @@ export class UsersService {
 
       
       if(findUser) 
-        throw new BadRequestException("user bad request")
+        throw new BadRequestException("El usuario ya se encuentra en sistema")
       const response = await this.prisma.$transaction(async(tx)=>{
 
         const userCreate = await tx.user.create({
