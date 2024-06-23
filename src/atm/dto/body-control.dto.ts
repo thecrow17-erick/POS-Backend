@@ -1,9 +1,8 @@
-import { IsDecimal, IsIn, IsInt, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsDecimal, IsInt, IsNumber } from "class-validator";
 
 export class BodyControlDto{
   @IsDecimal()
   monto:          string;
-
 
   @IsNumber()
   @IsInt()

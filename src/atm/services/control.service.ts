@@ -27,6 +27,14 @@ export class ControlService {
           type: "APERTURA"
         }
       })
+      await this.prisma.atm.update({
+        where:{
+          id: findAtm.id,
+        },
+        data:{
+          active: false
+        }
+      })
       this.logService.log({
         accion: `el usuario ${userId} abrio la caja ${bodyControlDto.atmId}`,
         fechaHora: new Date().toLocaleString(),
@@ -56,6 +64,15 @@ export class ControlService {
           monto: bodyControlDto.monto,
           atmId: bodyControlDto.atmId,
           type: "CIERRE"
+        }
+      })
+
+      await this.prisma.atm.update({
+        where:{
+          id: findAtm.id,
+        },
+        data:{
+          active: true
         }
       })
       this.logService.log({

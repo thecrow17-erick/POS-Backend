@@ -217,6 +217,7 @@ export class InvitationController {
     }
   }
 
+
   @Patch("resend/:id")
   @HttpCode(HttpStatus.OK)
   @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)

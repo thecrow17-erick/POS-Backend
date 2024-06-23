@@ -286,6 +286,7 @@ model City {
 model Atm {
   id         Int          @id @default(autoincrement())
   name       String       @db.VarChar(50)
+  active     Boolean      @default(true)
   status     Boolean      @default(true)
   branchId   Int
   createdAt  DateTime     @default(now()) @db.Timestamp(6)

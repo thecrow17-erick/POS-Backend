@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from '../service';
-import { LoginUser } from '../dto';
+import { LoginUser, updateMemberDto } from '../dto';
 import { Request } from 'express';
-import { TenantGuard } from '../guard';
+import { AuthServiceGuard, TenantGuard } from '../guard';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +38,22 @@ export class AuthController {
       statusCode,
       data: {
         ...data
+      }
+    }
+  }
+
+  @Patch("password-update/service")
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseGuards(AuthServiceGuard,TenantGuard)
+  async updatePasswordService(@Body() body : updateMemberDto,@Req() req : Request){
+    const statusCode = HttpStatus.ACCEPTED;
+    const tenantId = req.tenantId;
+    const userId = req.UserId;
+    return {
+      statusCode,
+      message: "password actualizado",
+      data: {
+        member: await this.authService.updatePassword(body,userId,tenantId)
       }
     }
   }

@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import {JwtService} from '@nestjs/jwt';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt  from 'bcrypt';
 
 import { UsersService } from 'src/users/service';
-import { LoginUser } from '../dto';
+import { LoginUser, updateMemberDto } from '../dto';
 import { PayloadToken, PayloadTokenTenant } from '../interface';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma';
@@ -73,12 +73,24 @@ export class AuthService {
           tenantId,
           userId: user.id
         },
-        include:{
-          rol:{
-            include:{
+        select:{
+          id: true,
+          userId: true,
+          passwordTenant: true,
+          rol: {
+            select:{
+              id: true,
+              desc: true,
+              status: true,
               permissions:{
-                include:{
-                  permission: true
+                select:{
+                  permission:{
+                    select:{
+                      desc: true,
+                      id: true,
+                      module: true,
+                    }
+                  }
                 }
               }
             }
@@ -104,7 +116,8 @@ export class AuthService {
 
       return {
         user,
-        token
+        token,
+        memberRole: findUserTenant
       }
 
     } catch (error) {
@@ -114,6 +127,42 @@ export class AuthService {
     }
   }
 
+  async updatePassword(body: updateMemberDto,userId: string,tenantId:number){
+    try {
+      const saltOrRounds = bcrypt.genSaltSync(10)
+      console.log(userId)
+      const userFind = await this.prisma.memberTenant.findFirst({
+        where:{
+          userId,
+          tenantId
+        }
+      })
+      if(!userFind)
+        throw new NotFoundException("el id no se encuentra en ningun usuario")
+      const passwordValid = bcrypt.compareSync(body.password,userFind.passwordTenant);
+      if(!passwordValid)
+        throw new UnauthorizedException("El password no es correcto, intente de nuevo")
+
+      const passwordUpdate = await this.prisma.memberTenant.update({
+        where:{
+          id: userFind.id,
+          tenantId
+        },
+        data:{
+          passwordTenant: bcrypt.hashSync(body.password_update,saltOrRounds)
+        }
+      })    
+
+      return passwordUpdate;
+    } catch (err) {
+      if(err instanceof NotFoundException)
+        throw err;
+      if(err instanceof UnauthorizedException)
+        throw err;
+
+      throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
+    }
+  }
 
   signJWT({
     payload,

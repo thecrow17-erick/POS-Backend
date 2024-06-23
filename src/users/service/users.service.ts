@@ -4,7 +4,7 @@ import * as bcrypt  from 'bcrypt';
 
 import { PrismaService } from 'src/prisma';
 import { CreateUserDto } from '../dto';
-import { IOptionUser } from '../interface';
+import { IOptionInvitation, IOptionUser } from '../interface';
 import { MailsService } from 'src/mails/mails.service';
 
 @Injectable()
@@ -122,4 +122,35 @@ export class UsersService {
     }
   }  
 
+  async findAllInvitation({
+    where,
+    select,
+    skip,
+    take,    
+  }:IOptionInvitation){
+    try {
+      const allInvitation = await this.prisma.invitationTenant.findMany({
+        where,
+        select,
+        skip,
+        take
+      })
+      return allInvitation;
+    } catch (err) {
+      throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
+    }
+  }
+
+  async countAllInvitation({
+    where,
+  }:IOptionInvitation){
+    try {
+      const allInvitation = await this.prisma.invitationTenant.count({
+        where,
+      })
+      return allInvitation;
+    } catch (err) {
+      throw new InternalServerErrorException(`server Error ${JSON.stringify(err)}`)
+    }
+  }
 }
