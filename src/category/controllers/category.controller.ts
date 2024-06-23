@@ -48,7 +48,7 @@ export class CategoryController {
   
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Permission("create category")
+  @Permission("crear categoria")
   async createCategory(@Body() body: CreateCategoryDto,@Req() req: Request){
     const tenantId = req.tenantId;
     const statusCode = HttpStatus.OK

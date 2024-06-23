@@ -70,10 +70,4 @@ export class UsersController {
       }
     }
   }
-
-  @Get()
-  testApi(){
-    return "hello world";
-  }
-
 } 
