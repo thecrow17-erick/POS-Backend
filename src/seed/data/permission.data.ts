@@ -133,6 +133,18 @@ export const permissionData: IPermissions[] = [
   {
     desc: "eliminar proveedor",
     module: "PROVEEDORES"
+  },
+  {
+    desc: "realizar venta",
+    module: "VENTAS"
+  },
+  {
+    desc: "agregar producto a sucursal",
+    module: "PRODUCTOS"
+  },
+  {
+    desc: "ver sucursales de producto",
+    module: "PRODUCTOS"
   }
 ]
 

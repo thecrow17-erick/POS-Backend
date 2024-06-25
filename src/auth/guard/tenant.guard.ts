@@ -23,7 +23,6 @@ export class TenantGuard implements CanActivate {
         hosting: subdomain
       }
     });
-
     if(!isSubdomain)
       throw new BadRequestException(`${subdomain} not found`)
 

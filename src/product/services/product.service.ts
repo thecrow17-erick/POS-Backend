@@ -78,6 +78,8 @@ export class ProductService {
           productCreate,
           categories: `${productCategories.count} inserted at product`
         }
+      },{
+        timeout: 50000000
       })
 
       this.logService.log({
@@ -167,6 +169,8 @@ export class ProductService {
 
       return findProduct;
     } catch (err) {
+      if(err instanceof NotFoundException)
+        throw err;
       throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`);
     }
   }
