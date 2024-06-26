@@ -183,8 +183,6 @@ export class SalesService {
       throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
     }
   }
-
-
   async createPdf(doc: PDFKit.PDFDocument): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = [];
