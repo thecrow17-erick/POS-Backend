@@ -228,7 +228,6 @@ model DetailsBuys {
 
 model Buys {
   id         Int           @id @default(autoincrement())
-  time       DateTime      @default(now()) @db.Timestamp(6)
   total      Decimal       @db.Decimal(10, 2)
   status     Boolean       @default(true)
   userId     String        @db.Uuid
@@ -323,7 +322,6 @@ model DetailsSales {
 
 model Sales {
   id              Int            @id @default(autoincrement())
-  time            DateTime       @default(now()) @db.Timestamp(6)
   total           Decimal        @db.Decimal(10, 2)
   pay             Decimal        @db.Decimal(10, 2)
   change          Decimal        @db.Decimal(10, 2)

@@ -92,7 +92,7 @@ export class ProviderController {
                 name: true
               }
             },
-            time: true
+            createdAt: true
           }
         },
         createdAt: true,

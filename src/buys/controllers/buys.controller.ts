@@ -6,7 +6,7 @@ import { BranchService } from 'src/branch/services';
 import { QueryCommonDto } from 'src/common';
 import { ProductService } from 'src/product/services';
 import { ProviderService } from 'src/provider/services';
-import { CreateBuyDto } from '../dto';
+import { CreateBuyDto, QueryBuyDto } from '../dto';
 import { BuysService } from '../services';
 
 @Controller('buy')
@@ -136,6 +136,61 @@ export class BuysController {
       statusCode,
       message: "compra de insumos creado",
       data: createBuy
+    } 
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @Permission("ver compras")
+  async findAllBuy(@Query() query: QueryBuyDto,@Req() req:Request){
+    const statusCode = HttpStatus.CREATED;
+    const tenantId = req.tenantId;
+    const {startDate,endDate,limit,skip} = query;
+    console.log({endDate,startDate})
+    const [total,allBuys] = await Promise.all([
+      this.buyService.countBuyss({
+        where:{
+          tenantId,
+          createdAt:{
+            gte: startDate,
+            lte: endDate,
+          }
+        }
+      }),
+      this.buyService.findAllBuyss({
+        where:{
+          tenantId,
+          createdAt:{
+            gte: startDate,
+            lte: endDate,
+          }
+        },
+        skip,
+        take:limit,
+        select:{
+          id: true,
+          provider: true,
+          user: true,
+          total: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      })
+    ])
+
+    const buys = allBuys.map(buy => ({
+      ...buy,
+      createdAt: buy.createdAt.toLocaleString(),
+      updatedAt: buy.updatedAt.toLocaleString(),
+    }))
+
+    return {
+      statusCode,
+      message: "compra de insumos creado",
+      data:{
+        total,
+        buys
+      }
     } 
   }
 }

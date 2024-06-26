@@ -4,6 +4,7 @@ import { ProductService } from '../../product/services/product.service';
 import { CreateBuyDto, InsertProductDto } from '../dto';
 import { BranchService } from '../../branch/services/branch.service';
 import { ProviderService } from 'src/provider/services';
+import { IOptionBuys } from '../interface';
 
 @Injectable()
 export class BuysService {
@@ -135,4 +136,39 @@ export class BuysService {
   calculatAmount(price: string, cant:number){
     return parseFloat(price) * cant; 
   }
+
+  async findAllBuyss({
+    where,
+    skip,
+    take,
+    select,
+    orderBy,
+  }:IOptionBuys){
+    try {
+      const allBuys = await this.prisma.buys.findMany({
+        where,
+        select,
+        skip,
+        take,
+        orderBy,
+      })
+      return allBuys;
+    } catch (err) {
+      throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
+    }
+  }
+
+  async countBuyss({
+    where,
+  }:IOptionBuys){
+    try {
+      const allBuys = await this.prisma.buys.count({
+        where,
+      })
+      return allBuys;
+    } catch (err) {
+      throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
+    }
+  }
+
 }

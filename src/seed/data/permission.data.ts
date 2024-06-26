@@ -149,6 +149,10 @@ export const permissionData: IPermissions[] = [
   {
     desc: "realizar comprar",
     module: "COMPRAS"
+  },
+  {
+    desc: "ver compras",
+    module: "COMPRAS"
   }
 ]
 
