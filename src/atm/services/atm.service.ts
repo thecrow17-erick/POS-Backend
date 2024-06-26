@@ -149,14 +149,14 @@ export class AtmService {
 
   async remove(id: number,userId: string) {
     try {
-      await this.findOne(id,{});
+      const findAtm = await this.findOne(id,{});
       //ahora si actualizo
       const branchUpdate = await this.prisma.atm.update({
         where:{
           id
         },
         data: {
-          status: false
+          status: !findAtm.status
         }
       });
 
