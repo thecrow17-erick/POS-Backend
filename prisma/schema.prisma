@@ -329,7 +329,6 @@ model Sales {
   status          Boolean        @default(true)
   atmId           Int
   clientId        String         @db.Uuid
-  paymentMethodId Int
   state           StateSale
   statePay        StatePay
   saleReturn      SalesReturn?
@@ -340,7 +339,6 @@ model Sales {
   details         DetailsSales[]
   atm             Atm            @relation(fields: [atmId], references: [id])
   client          Client         @relation(fields: [clientId], references: [id])
-  paymentMethod   PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
   Tenant          Tenant         @relation(fields: [tenantId], references: [id])
 }
 
@@ -380,13 +378,7 @@ model Client {
   sales     Sales[]
 }
 
-model PaymentMethod {
-  id          Int      @id @default(autoincrement())
-  description String   @db.VarChar(60)
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  sales       Sales[]
-}
+
 
 enum StateSale {
   DEVOLUCION

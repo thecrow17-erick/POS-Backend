@@ -14,6 +14,9 @@ import { LogModule } from 'src/log/log.module';
     BranchModule,
     UsersModule,
     LogModule
+  ],
+  exports:[
+    AtmService
   ]
 })
 export class AtmModule {}

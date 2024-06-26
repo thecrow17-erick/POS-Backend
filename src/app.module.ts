@@ -20,6 +20,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { LogModule } from './log/log.module';
 import { SalesModule } from './sales/sales.module';
 import { BuysModule } from './buys/buys.module';
+import { PrinterModule } from './printer/printer.module';
+import { ReportsModule } from './reports/reports.module';
 
 
 @Module({
@@ -56,6 +58,8 @@ import { BuysModule } from './buys/buys.module';
     LogModule,
     SalesModule,
     BuysModule,
+    PrinterModule,
+    ReportsModule,
   ],
   providers: [],
 })

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+    * { font-family: Poppins, system-ui; padding: 0px; margin: 0px; color: black; }
+    .btn { 
+      background-color: #5bc0de; 
+      font-weight: bold;
+      font-size: 16px; /* Tamaño del texto aumentado */
+      padding: 10px 20px; /* Espaciado interno del botón */
+      border: none; /* Sin bordes */
+      border-radius: 5px; /* Bordes redondeados */
+      text-decoration: none; /* Sin subrayado */
+      color: white; /* Texto en blanco */
+      display: inline-block; /* Mostrar como un bloque en línea */
+      margin-top: 20px; /* Espacio en la parte superior */
+    }
+    .container { width: 50%; }
+    .content { max-width: 600px; margin: 0 auto; }
+    .card { border-radius: 10px; background-color: white; box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08); text-align: center; padding: 40px 30px; }
+    .card h1 { font-weight: bold; }
+    .card img { margin-top: 30px; width: 150px; height: 150px; }
+    .card h2 { margin: 30px 0; }
+    .card p { margin-bottom: 10px; text-align: justify; }
+  </style>
+</head>
+<body style="margin: 0; padding: 0;">
+  <table class="container" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; margin: 0 auto;">
+    <tr>
+      <td class="content">
+        <div class="card">
+          <h1><strong>¡Gracias por tu compra! Aquí tienes tu factura</strong></h1>
+          <img src="https://www.shutterstock.com/image-vector/online-payment-security-concept-smartphone-600nw-2284800905.jpg" class="my-3" alt="Email image">
+          <p>¡Muchas gracias por tu reciente compra en <strong>{{nombre_tienda}}</strong>!</p>
+          <p>Apreciamos mucho tu visita y tu preferencia. Tu satisfacción es nuestra prioridad y nos alegra saber que has elegido nuestros productos. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
+          <p>Puedes descargar tu factura adjunta a este correo electrónico o haciendo clic en el siguiente enlace:</p>
+          <a href="cid:factura_pdf" class="btn">Descargar Factura</a>
+          <p>Esperamos verte de nuevo pronto.</p>
+          <p><strong>Atentamente:</strong></p>
+          <p>{{nombre_tienda}}</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

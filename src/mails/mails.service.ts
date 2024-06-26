@@ -84,6 +84,28 @@ export class MailsService {
       },
     });
   }
-
+  
+  async sendFactura(
+    email: string,
+    nombre_tienda: string,
+    file: Express.Multer.File,
+  ) {
+    await this.mailService.sendMail({
+      to: email,
+      subject: '¡Gracias por tu compra! Aquí tienes tu factura',
+      template: './factura', // asegúrate de que este archivo de plantilla exista
+      context: {
+        nombre_tienda,
+      },
+      attachments: [
+        {
+          filename: file.originalname,
+          content: file.buffer,
+          contentType: 'application/pdf',
+          cid: 'factura_pdf', // para referenciar en el cuerpo del correo
+        },
+      ],
+    });
+  }
 
 }
