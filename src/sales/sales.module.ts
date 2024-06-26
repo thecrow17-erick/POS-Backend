@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { InventoryController } from './controllers/product.controller';
+import { InventoryController } from './controllers';
 import { ProductModule } from 'src/product/product.module';
 import { UsersModule } from 'src/users/users.module';
 import { PrismaModule } from 'src/prisma';
-import { InventoryService } from './services/inventory.service';
+import { InventoryService } from './services';
 
 @Module({
   controllers: [InventoryController],

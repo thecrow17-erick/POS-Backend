@@ -12,6 +12,9 @@ import { LogModule } from 'src/log/log.module';
     PrismaModule,
     UsersModule,
     LogModule
+  ],
+  exports: [
+    ProviderService
   ]
 })
 export class ProviderModule {}

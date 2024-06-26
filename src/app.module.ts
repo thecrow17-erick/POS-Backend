@@ -19,6 +19,7 @@ import { ProviderModule } from './provider/provider.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LogModule } from './log/log.module';
 import { SalesModule } from './sales/sales.module';
+import { BuysModule } from './buys/buys.module';
 
 
 @Module({
@@ -54,6 +55,7 @@ import { SalesModule } from './sales/sales.module';
     ProviderModule,
     LogModule,
     SalesModule,
+    BuysModule,
   ],
   providers: [],
 })
