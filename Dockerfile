@@ -7,6 +7,7 @@ COPY package*.json ./
 
 RUN npm install
 
+COPY fonts ./fonts
 COPY prisma ./prisma/
 
 COPY . .
@@ -24,6 +25,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/fonts ./fonts
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/prisma ./prisma
 COPY --from=build /usr/src/app/package.json  ./package.json
