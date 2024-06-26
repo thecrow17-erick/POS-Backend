@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { InsertSaleProductDto } from "./insert-sale-product.dto";
-import { ArrayMinSize, ArrayNotEmpty, IsArray, IsDecimal, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, MinLength, ValidateNested } from "class-validator";
+import { ArrayMinSize, ArrayNotEmpty, IsArray, IsDecimal, IsEmail, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, IsUUID, MinLength, ValidateNested } from "class-validator";
 import { StatePay, $Enums } from '@prisma/client';
 
 export class CreateBuyDto{
@@ -26,12 +26,12 @@ export class CreateBuyDto{
   nitClient?:     string;
 
   @IsString()
-  @IsUUID()
-  clientId:     string;
+  @IsEmail()
+  client:         string;
 
   @IsNumber()
   @IsInt()
-  atmId:        number;
+  atmId:          number;
 
   @IsEnum(StatePay)
   type:        StatePay;

@@ -5,8 +5,9 @@ import { PrismaService } from 'src/prisma';
 import { ProductService } from 'src/product/services';
 import { CreateBuyDto } from '../dto';
 import { ReportsService } from 'src/reports/reports.service';
-import { MailsModule } from 'src/mails/mails.module';
 import { MailsService } from 'src/mails/mails.service';
+import { ISale } from '../interface';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class SalesService {
@@ -26,7 +27,6 @@ export class SalesService {
   async createProductSales(body: CreateBuyDto,userId: string, tenantId: number){
     try {
       const findBranch = await this.branchService.findOne(body.branchId,{});
-      const findClient = await this.findClienId(body.clientId);
       const findAtm = await this.atmService.findOne(body.atmId,{});
       const findProducts = await this.productService.findAllProducts({
         where:{
@@ -57,7 +57,17 @@ export class SalesService {
           ]
         }
       })
-
+      const findTenant = await this.prisma.tenant.findUnique({
+        where:{
+          id: tenantId
+        }
+      })
+      const member = await this.prisma.memberTenant.findFirst({
+        where:{
+          userId,
+          tenantId
+        }
+      })
       if(findProducts.length !== body.products.length)
         throw new NotFoundException("Ingrese solo productos disponibles en la sucursal")
 
@@ -65,7 +75,7 @@ export class SalesService {
         let total:number = 0;
         const createSale = await t.sales.create({
           data:{
-            clientId: findClient.id,
+            client: body.client,
             state: "VENDIDO",
             statePay: body.type,
             nitClient: body.nitClient,
@@ -76,7 +86,6 @@ export class SalesService {
             tenantId,
           }
         });
-        console.log(createSale);
         const createManySale = await t.detailsSales.createMany({
           data: body.products.map((b) =>{  
             const product = findProducts.find( p => p.id === b.productId);
@@ -90,7 +99,6 @@ export class SalesService {
             }   
           })
         })
-        console.log(createManySale);
         const updateSale = await t.sales.update({
           where:{
             id: createSale.id
@@ -99,7 +107,6 @@ export class SalesService {
             total
           }
         })
-        console.log(updateSale);
         for (const product of body.products) {
           const findStock = await this.prisma.stock.findFirst({
             where:{
@@ -135,10 +142,38 @@ export class SalesService {
             }
           });
         }
+
+        const datamail: ISale = {
+          nombre_empresa: findTenant.name,
+          clientName: body.client,
+          IdUsuario: member.id,
+          logoUrl: "",
+          nro_factura: createSale.id,
+          products: body.products.map(b =>{
+            const product = findProducts.find( p => p.id === b.productId);
+            const importe = this.calculatAmount(product.price.toString(),b.cant);
+            return{
+              ID: product.id,
+              Cantidad: b.cant,
+              Precio: product.price.toString(),
+              Producto: product.name,
+              Total: importe
+            }
+          })
+        }
+        const billSale = await this.reportService.getBillReport(datamail);
+        const bill_pdf = await this.createPdf(billSale);
+        await this.mailServce.sendFactura(
+          body.client,
+          findTenant.name,
+          bill_pdf
+        )
         return {
           sale: updateSale,
           details: `${createManySale.count} detalles creado`
         }
+      },{
+        timeout: 500000
       });
       return response;
     } catch (err) {
@@ -150,23 +185,17 @@ export class SalesService {
   }
 
 
-  async findClienId(id: string){
-    try {
-      const findClient = await this.prisma.client.findUnique({
-        where:{
-          id
-        }
-      })
-      if(!findClient)
-        throw new NotFoundException("cliente no esta disponible")
+  async createPdf(doc: PDFKit.PDFDocument): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      const stream = new PassThrough();
 
-      return findClient;
-    } catch (err) {
-      if(err instanceof NotFoundException)
-        throw err;
+      doc.pipe(stream);
+      doc.end();
 
-      throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
-    }
+      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('end', () => resolve(Buffer.concat(chunks)));
+      stream.on('error', (err) => reject(err));
+    });
   }
-  
 }

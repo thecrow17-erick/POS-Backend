@@ -31,7 +31,6 @@ model Tenant {
   Buys        Buys[]
   Category    Category[]
   City        City[]
-  Client      Client[]
   invitations InvitationTenant[]
   roles         Rol[]
   Product     Product[]
@@ -328,7 +327,7 @@ model Sales {
   nitClient       String?        @db.VarChar(20)
   status          Boolean        @default(true)
   atmId           Int
-  clientId        String         @db.Uuid
+  client          String         @db.Char(50)
   state           StateSale
   statePay        StatePay
   saleReturn      SalesReturn?
@@ -338,7 +337,6 @@ model Sales {
   tenantId        Int
   details         DetailsSales[]
   atm             Atm            @relation(fields: [atmId], references: [id])
-  client          Client         @relation(fields: [clientId], references: [id])
   Tenant          Tenant         @relation(fields: [tenantId], references: [id])
 }
 
@@ -366,17 +364,7 @@ model SalesReturn{
   updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamp(6)
 }
 
-model Client {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @db.VarChar(60)
-  name      String   @db.VarChar(50)
-  status    Boolean  @default(true)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  tenantId  Int
-  Tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  sales     Sales[]
-}
+
 
 
 

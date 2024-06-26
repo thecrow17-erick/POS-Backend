@@ -88,7 +88,7 @@ export class MailsService {
   async sendFactura(
     email: string,
     nombre_tienda: string,
-    file: Express.Multer.File,
+    file: Buffer,
   ) {
     await this.mailService.sendMail({
       to: email,
@@ -99,8 +99,8 @@ export class MailsService {
       },
       attachments: [
         {
-          filename: file.originalname,
-          content: file.buffer,
+          filename: `factura_${new Date().toLocaleString()}.pdf`,
+          content: file,
           contentType: 'application/pdf',
           cid: 'factura_pdf', // para referenciar en el cuerpo del correo
         },

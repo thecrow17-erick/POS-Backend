@@ -10,7 +10,7 @@ export interface ISale {
 export interface Product {
   ID:       number;
   Producto: string;
-  Precio:   number;
+  Precio:   string;
   Cantidad: number;
   Total:    number;
 }
