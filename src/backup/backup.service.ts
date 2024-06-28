@@ -8,7 +8,7 @@ export class BackupService {
   constructor(private readonly azureService: AzureConnectionService) {}
 
 
-  @Cron('*/5 * * * *')
+  @Cron('0 0 1 */3 *')
   async executeBackup():Promise<void>  {
     try {
       // Llama al método de AzureConnectionService para crear el respaldo y subirlo a Azure Blob Storage
