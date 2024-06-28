@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
@@ -21,40 +21,51 @@ export class RolesGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<Request>();
     const userId = req.UserId;
     const tenantId = req.tenantId;
-    const findRolMember = await this.prisma.rol.findFirst({
+    const findRolMember = await this.prisma.memberTenant.findFirst({
       where:{
         AND:[
           {
             tenantId,
           },
           {
-            members:{
-              every:{
-                userId
-              }
-            }
+            userId
           }
         ]
       },
+      select:{
+        rol: true,
+        user: true,
+      }
     })
     if(!findRolMember)
-      throw new UnauthorizedException("the user does not belong to the tenant")
+      throw new UnauthorizedException("El usuario debe pertenecer a un area de trabajo")
     
-    const findPermission = await this.prisma.rolePermission.findMany({
+
+    const findPermission = await this.prisma.permission.findMany({
       where:{
-        rolId: findRolMember.id,
-        permission:{
-          OR: permissions.map( p => ({
-            desc: p
-          }))
+          OR: permissions.map ( p => ({desc: p}))
+        }
+      })
+    
+    if(findPermission.length !== permissions.length)
+      throw new NotFoundException("no existen todos los permisos")
+    
+    
+    const findPermissionRole = await this.prisma.rolePermission.findMany({
+      where:{
+        rolId: findRolMember.rol.id,
+        permissionid:{
+          in: findPermission.map(p => p.id)
         }
       },
       select:{
-        rol: true,
-        permission: true
+        permission: true,
+        rol: true
       }
-    })
-    if(findPermission.length == permissions.length)
+    }) 
+
+    console.log(findPermissionRole)
+    if(findPermissionRole.length === permissions.length)
       return true;
 
     throw new UnauthorizedException("El rol no tiene este permiso")

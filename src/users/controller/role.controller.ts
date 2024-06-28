@@ -26,31 +26,23 @@ export class RoleController {
       this.roleService.countTenantRoles({
         where:{
           tenantId,
-          desc:{
-            not: roleAdmin,
-            contains:search,
-            mode: "insensitive"
-          }
         }
       }),
       this.roleService.allTenantRoles({
         where:{
           tenantId,
-          desc:{
-            not: roleAdmin,
-            contains:search,
-            mode: "insensitive"
-          }
         },
         skip,
         take: limit
       })
     ])
-    const allRoles = totalroles.map(r =>({
-      ...r,
-      createdAt: r.createdAt.toLocaleString(),
-      updatedAt: r.updatedAt.toLocaleString()
-    }));
+    const allRoles = totalroles.map((r) => r.desc !== roleAdmin &&
+        ({
+          ...r,
+          createdAt: r.createdAt.toLocaleString(),
+          updatedAt: r.updatedAt.toLocaleString()
+        })
+    );
 
     return {
       statusCode,
