@@ -1,6 +1,7 @@
 export enum container {
   imagenes = 'imagenes',
   logs = 'logs',
+  backup = 'backup'
 }
 
 export enum responseFiles{

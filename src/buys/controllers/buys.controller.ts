@@ -14,7 +14,6 @@ import { BuysService } from '../services';
 export class BuysController {
 
   constructor(
-    private readonly productService: ProductService,
     private readonly providerService: ProviderService,
     private readonly branchService: BranchService,
     private readonly buyService: BuysService

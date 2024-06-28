@@ -22,6 +22,7 @@ import { SalesModule } from './sales/sales.module';
 import { BuysModule } from './buys/buys.module';
 import { PrinterModule } from './printer/printer.module';
 import { ReportsModule } from './reports/reports.module';
+import { BackupModule } from './backup/backup.module';
 
 
 @Module({
@@ -60,6 +61,7 @@ import { ReportsModule } from './reports/reports.module';
     BuysModule,
     PrinterModule,
     ReportsModule,
+    BackupModule,
   ],
   providers: [],
 })

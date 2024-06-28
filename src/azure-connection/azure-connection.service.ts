@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import { ConfigService } from '@nestjs/config';
+import { exec } from 'child_process';
+import * as util from 'util';
 import { container, responseFiles } from 'src/constants';
 
 @Injectable()
 export class AzureConnectionService {
-
+  private readonly container = 'backup';
   constructor(
     private readonly configService: ConfigService
   ){}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   getBlockBlobClient(filename: string,containerName: keyof typeof container): BlockBlobClient {
     const blobServiceClient = BlobServiceClient.fromConnectionString(
@@ -63,6 +61,41 @@ export class AzureConnectionService {
     } catch (err) {
       console.log(err);
       return "error"
+    }
+  }
+  async createBackupAndUpload(): Promise<void> {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().replace(/:/g, '-');
+    const backupFileName = `${formattedDate}.dump`;
+
+    console.log(backupFileName)
+    const pgDumpCommand = `pg_dump -U ${this.configService.get<string>("DB_USER")} -d ${this.configService.get<string>("DB_NAME")} -h ${this.configService.get<string>("DB_HOST")} -w -Fc`; 
+
+    console.log(pgDumpCommand)
+    // const pgDumpCommand = `pg_dump -U ${this.configService.get<string>("DB_USER")} -d ${this.configService.get<string>("DB_NAME")} -f ${backupFileName} -w -Fc`;
+
+    // Ejecutar el comando usando util.promisify
+    const execPromise = util.promisify(exec);
+    try {
+      const { stdout } = await execPromise(pgDumpCommand,{
+        env:{
+          PGPASSWORD:this.configService.get<string>("DB_PASSWORD")
+        }
+      });
+
+      // Crear el cliente de BlobService y obtener el cliente de Blob
+      const blockBlobClient = this.getBlockBlobClient(backupFileName,"backup");
+
+      // Convertir stdout (string) a un ArrayBuffer
+      const content = Buffer.from(stdout, 'utf8').buffer;
+
+      // Subir los datos directamente al Blob
+      await blockBlobClient.uploadData(content);
+
+      console.log('Backup de la base de datos y subida a Azure Blob Storage completados.');
+    } catch (error) {
+      console.error('Error al realizar el backup y subirlo a Azure Blob Storage:', error);
+      throw error;
     }
   }
 }

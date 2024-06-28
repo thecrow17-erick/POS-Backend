@@ -18,6 +18,9 @@ RUN npm run build
 #prod stage
 FROM node:20.11.1-alpine3.19 AS prod
 
+# Instala `pg_dump`
+RUN apk update && apk add postgresql-client
+
 WORKDIR /usr/src/app
 
 
