@@ -64,7 +64,6 @@ export class RolesGuard implements CanActivate {
       }
     }) 
 
-    console.log(findPermissionRole)
     if(findPermissionRole.length === permissions.length)
       return true;
 
