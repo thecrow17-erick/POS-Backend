@@ -23,13 +23,14 @@ export class BuysController {
   @Get("product/:id")
   @HttpCode(HttpStatus.OK)
   @Permission("realizar comprar")
-  async findProductId(@Param('id', ParseIntPipe)productId: number){
+  async findProductId(@Req() req:Request ,@Param('id', ParseIntPipe) productId: number, @Query('branchId',ParseIntPipe) branchId: number){
     const statusCode = HttpStatus.OK;
+    const tenantId = req.tenantId;
     return{
       statusCode,
       message: "buscar producto",
       data:{
-        product: await this.productService.findProducId(productId,{})
+        product: await this.buyService.findIdProduct(productId,tenantId,branchId) 
       }
     }
   } 

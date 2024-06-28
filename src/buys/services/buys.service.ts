@@ -1,7 +1,7 @@
-import { Injectable, InternalServerErrorException, NotFoundException, Param } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma';
 import { ProductService } from '../../product/services/product.service';
-import { CreateBuyDto, InsertProductDto } from '../dto';
+import { CreateBuyDto } from '../dto';
 import { BranchService } from '../../branch/services/branch.service';
 import { ProviderService } from 'src/provider/services';
 import { IOptionBuys } from '../interface';
@@ -15,6 +15,39 @@ export class BuysService {
     private readonly branchService:BranchService,
     private readonly providerService: ProviderService
   ){}
+
+  async findIdProduct(id: number, tenantId: number,branchId: number){
+    try {
+      const findBranch = await this.branchService.findOne(branchId,{});
+
+      const findProductId = await this.productService.findProducId(id,{});
+
+      const findStock = await this.prisma.stock.findFirst({
+        where:{
+          productId: findProductId.id
+        }
+      })
+      if(!findStock)
+        throw new NotFoundException("no se encuentra producto en stock");
+      
+      const findInventory = await this.prisma.inventory.findUnique({
+        where:{
+          branchId_stockId:{
+            branchId: findBranch.id,
+            stockId: findStock.id
+          }
+        }
+      });
+      if(!findInventory)
+        throw new NotFoundException("El producto no se encuentra en la sucursal");
+
+      return findProductId;
+    } catch (err) {
+      if(err instanceof NotFoundException)
+        throw err;
+      throw new InternalServerErrorException(`server error ${JSON.stringify(err)}`)
+    }
+  }
 
   async createBuyssProduct(body: CreateBuyDto,userId: string, tenantId: number){
     try {
