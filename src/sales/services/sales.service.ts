@@ -8,6 +8,9 @@ import { ReportsService } from 'src/reports/reports.service';
 import { MailsService } from 'src/mails/mails.service';
 import { ISale } from '../interface';
 import { PassThrough } from 'stream';
+import { Prisma } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
+import { QueryBuyDto } from 'src/buys/dto';
 
 @Injectable()
 export class SalesService {
@@ -195,5 +198,65 @@ export class SalesService {
       stream.on('end', () => resolve(Buffer.concat(chunks)));
       stream.on('error', (err) => reject(err));
     });
+  }
+
+  async findClients(query: QueryBuyDto){
+    const findClients = await this.prisma.sales.groupBy({
+      by: ['client'],
+      _sum: {
+        total: true
+      },
+      where:{
+        createdAt:{
+          gte: new Date(query.startDate),
+          lte: new Date(query.endDate),
+        }
+      }
+    })
+    let total : number= 0;
+    let clientEmail = "";
+    findClients.map((client) => {
+      const suma = client._sum.total.toNumber();
+      if( suma > total){
+        clientEmail = client.client;
+        total = suma;
+      }
+    });
+
+    const findssales = await this.prisma.detailsSales.groupBy({
+      by: ['saleId'],
+      _sum: {
+        cant: true,
+      },
+      orderBy: {
+        _sum: {
+          cant: 'desc',
+        },
+      },
+      take: 1,  // Seleccionar solo el primer resultado
+    });
+    console.log(findssales)
+    if (findssales.length > 0) {
+      const clientSales = findssales[0];
+  
+      // Obtener el cliente con mayor cantidad comprada
+      const cliente = await this.prisma.sales.findUnique({
+        where: {
+          id: clientSales.saleId,
+        },
+      });
+  
+      return {
+        MAS_CANT:{
+          client: cliente.client,
+          totalCantidad: clientSales._sum.cant,
+        },
+        MAS_GASTADO:{
+          total,
+          clientEmail
+        }
+      };
+
+    }
   }
 }

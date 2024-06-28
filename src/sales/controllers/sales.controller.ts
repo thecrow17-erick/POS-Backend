@@ -1,9 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Permission } from 'src/auth/decorators';
 import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { CreateBuyDto } from '../dto';
 import { Request } from 'express';
 import { SalesService } from '../services/sales.service';
+import { QueryBuyDto } from 'src/buys/dto';
 
 @Controller('sales')
 @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
@@ -25,5 +26,11 @@ export class SalesController {
       message: "venta realizada exitosamente",
       data: createBuy
     } 
+  }
+
+
+  @Get("client")
+  async findCLientSales(@Query() query: QueryBuyDto){
+    return await this.saleService.findClients(query);
   }
 }

@@ -7,8 +7,8 @@ import { BackupService } from './backup/backup.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix("api");  
-  const backupService = app.get(BackupService);
-  await backupService.executeBackup();
+  // const backupService = app.get(BackupService);
+  // await backupService.executeBackup();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
