@@ -243,6 +243,10 @@ export class SalesService {
       const cliente = await this.prisma.sales.findUnique({
         where: {
           id: clientSales.saleId,
+          createdAt:{
+            gte: new Date(query.startDate),
+          lte: new Date(query.endDate),
+          }
         },
       });
   
@@ -253,7 +257,7 @@ export class SalesService {
         },
         MAS_GASTADO:{
           total,
-          clientEmail
+          client: clientEmail
         }
       };
 
