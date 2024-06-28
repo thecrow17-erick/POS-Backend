@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { CORS } from './constants';
-import * as schedule from 'node-schedule';
 import { BackupService } from './backup/backup.service';
 
 async function bootstrap() {

@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
 import { LogModule } from 'src/log/log.module';
 import { BranchModule } from 'src/branch/branch.module';
 import { BranchProductService } from './services/branch-product.service';
+import { CategoryModule } from 'src/category/category.module';
 
 @Module({
   controllers: [ProductController, BranchController],
@@ -18,7 +19,8 @@ import { BranchProductService } from './services/branch-product.service';
     PrismaModule,
     UsersModule,
     LogModule,
-    BranchModule
+    BranchModule,
+    CategoryModule
   ],
   exports: [
     ProductService

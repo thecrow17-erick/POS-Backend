@@ -8,6 +8,7 @@ import { AzureConnectionService } from 'src/azure-connection/azure-connection.se
 import { QueryCommonDto } from 'src/common';
 import { UpdateProductDto } from '../dto';
 import { Permission } from 'src/auth/decorators';
+import { CategoryService } from 'src/category/services';
 
 @Controller('product')
 @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
@@ -15,8 +16,41 @@ export class ProductController {
 
   constructor(
     private readonly productService: ProductService,
-    private readonly azureService: AzureConnectionService
+    private readonly azureService: AzureConnectionService,
+    private readonly categoryService: CategoryService
   ){}
+
+  @Get("category")
+  @HttpCode(HttpStatus.OK)
+  @Permission("crear producto")
+  async allCategories(@Query() query: QueryCommonDto,@Req() req: Request){
+    const tenantId = req.tenantId;
+    const {limit,skip} = query;
+    const statusCode = HttpStatus.OK
+    const [total, allCategories] = await Promise.all([
+      this.categoryService.countCategory({
+        where:{
+          tenantId
+        }
+      }),
+      this.categoryService.allCategories({
+        where:{
+          tenantId,
+        },
+        skip,
+        take: limit,
+      })
+    ])
+
+    return {
+      statusCode,
+      message: "all categories",
+      data: {
+        total,
+        allCategories
+      }
+    }
+  }
 
   @Get()
   @Permission("ver producto")

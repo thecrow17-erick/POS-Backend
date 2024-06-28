@@ -5,11 +5,71 @@ import { ParseQueryPipe, QueryCommonDto } from 'src/common';
 import { Request } from 'express';
 import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { Permission } from 'src/auth/decorators';
+import { BranchService } from 'src/branch/services';
 
 @Controller('atm')
 @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class AtmController {
-  constructor(private readonly atmService: AtmService) {}
+  constructor(
+    private readonly atmService: AtmService,
+    private readonly branchService: BranchService
+  ) {}
+
+  @Get('branch')
+  @Permission("crear cajero")
+  @HttpCode(HttpStatus.OK)
+  async findAllBranchs(@Query(new ParseQueryPipe()) query: QueryCommonDto, @Req() req: Request) {
+    const statusCode = HttpStatus.OK;
+    const { limit,skip,search} = query;
+    const tenantId = req.tenantId;
+    const [branchs,total] = await Promise.all([
+      this.branchService.findAll(
+        {
+          where:{
+            tenantId,
+            name:{
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          skip,
+          take: limit,
+          select:{
+            id: true,
+            address: true,
+            status: true,
+            name: true,
+            createdAt: true,
+            updatedAt: true,
+            city:true
+          }
+      }),
+      this.branchService.countAll({
+        where:{
+          tenantId,
+          name:{
+            contains: search,
+            mode: "insensitive"
+          }
+        }
+      })
+    ])
+
+    const allBranchs = branchs.map(branch => ({
+      ...branch,
+      createdAt: branch.createdAt.toLocaleString(),
+      updatedAt: branch.updatedAt.toLocaleString()
+    }))
+
+    return {
+      statusCode,
+      message: "All branchs",
+      data: {
+        total,
+        branchs: allBranchs
+      }
+    }
+  }
 
   @Post()
   @Permission("crear cajero")

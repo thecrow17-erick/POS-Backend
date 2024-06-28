@@ -5,11 +5,55 @@ import { ParseQueryPipe, QueryCommonDto } from 'src/common';
 import { Request } from 'express';
 import { AuthServiceGuard, RolesGuard, TenantGuard } from 'src/auth/guard';
 import { Permission } from 'src/auth/decorators';
+import { CityService } from 'src/city/services';
 
 @Controller('branch')
 @UseGuards(TenantGuard,AuthServiceGuard,RolesGuard)
 export class BranchController {
-  constructor(private readonly branchService: BranchService) {}
+  constructor(
+    private readonly branchService: BranchService,
+    private readonly cityService: CityService,
+  ) {}
+
+  @Get("city")
+  @Permission("crear sucursal")
+  @HttpCode(HttpStatus.OK)
+  async findAllCity(@Query(new ParseQueryPipe()) query: QueryCommonDto, @Req() req: Request) {
+    const statusCode = HttpStatus.OK;
+    const tenantId = req.tenantId;
+    const {limit,skip,search} = query;
+    const [citys,total] = await Promise.all([
+      this.cityService.findAll({
+        where:{
+          name: {
+            contains: search,
+            mode: "insensitive"
+          },
+          tenantId
+        },
+        skip, 
+        take:limit,
+      }),
+      await this.cityService.countAll({
+        where:{
+          name: {
+            contains: search,
+            mode: "insensitive"
+          },
+          tenantId
+        },
+      })
+    ])
+    
+    return{
+      statusCode,
+      message: "All Citys",
+      data:{
+        total,
+        citys
+      }
+    }
+  }
 
   @Post()
   @Permission("crear sucursal")
