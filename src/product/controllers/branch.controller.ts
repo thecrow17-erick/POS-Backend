@@ -29,7 +29,7 @@ export class BranchController {
           AND: [
             {
               inventorys:{
-                some:{
+                every:{
                   stock:{
                     productId:{
                       not: productId

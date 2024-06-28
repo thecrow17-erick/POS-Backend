@@ -62,7 +62,7 @@ export class ControlController {
     }
   }
 
-  @Get("  ")
+  @Get("branchs")
   @Permission("control caja")
   @HttpCode(HttpStatus.OK)
   async findBranch(@Query(new ParseQueryPipe) query:QueryCommonDto,@Req() req: Request){
