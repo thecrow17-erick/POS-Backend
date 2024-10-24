@@ -245,7 +245,7 @@ export class SalesService {
           id: clientSales.saleId,
           createdAt:{
             gte: new Date(query.startDate),
-          lte: new Date(query.endDate),
+            lte: new Date(query.endDate),
           }
         },
       });
